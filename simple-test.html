@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple PDF Test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="pdf-generator.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .test-content {
+            background: white;
+            padding: 40px;
+            margin: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            width: 800px;
+        }
+        .test-button {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        .test-button:hover {
+            background: #991b1b;
+        }
+        .log-area {
+            background: #1f2937;
+            color: #10b981;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 14px;
+            margin: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Simple PDF Generator Test</h1>
+    
+    <div class="test-content" id="testContent">
+        <h2>Test Report Content</h2>
+        <p>This is a simple test to verify that the PDF generator is working correctly.</p>
+        
+        <h3>Client Information</h3>
+        <p><strong>Name:</strong> Test Client</p>
+        <p><strong>Email:</strong> test@example.com</p>
+        <p><strong>Phone:</strong> 555-0123</p>
+        
+        <h3>Property Details</h3>
+        <p><strong>Address:</strong> 123 Test Street, Boston, MA</p>
+        <p><strong>Type:</strong> Residential</p>
+        
+        <h3>Inspection Results</h3>
+        <p>✅ Structural Integrity: Pass</p>
+        <p>✅ Corrosion Level: Minor</p>
+        <p>✅ Fasteners Condition: Good</p>
+        
+        <h3>Recommendations</h3>
+        <ul>
+            <li>Schedule annual maintenance</li>
+            <li>Repaint within 6 months</li>
+            <li>Install additional lighting</li>
+        </ul>
+        
+        <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h4>Test Image Placeholder</h4>
+            <p>This represents where images would be placed in a real report.</p>
+        </div>
+        
+        <p style="color: #6b7280; font-size: 14px; margin-top: 40px;">
+            Generated on: <span id="timestamp"></span>
+        </p>
+    </div>
+    
+    <button class="test-button" onclick="testSimplePDF()">Generate Simple PDF</button>
+    <button class="test-button" onclick="testAdvancedPDF()">Generate Advanced PDF</button>
+    <button class="test-button" onclick="clearLogs()">Clear Logs</button>
+    
+    <div class="log-area" id="logArea">
+        <div>🚀 PDF Test Ready</div>
+        <div>Click a button to start testing...</div>
+    </div>
+
+    <script>
+        // Set timestamp
+        document.getElementById('timestamp').textContent = new Date().toLocaleString();
+        
+        // Logging function
+        function log(message) {
+            const logArea = document.getElementById('logArea');
+            const timestamp = new Date().toLocaleTimeString();
+            logArea.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+            logArea.scrollTop = logArea.scrollHeight;
+            console.log(message);
+        }
+        
+        function clearLogs() {
+            document.getElementById('logArea').innerHTML = '<div>🚀 Logs cleared</div>';
+        }
+        
+        // Test simple PDF generation
+        async function testSimplePDF() {
+            log('🧪 Starting simple PDF test...');
+            
+            try {
+                // Check if libraries are loaded
+                if (typeof window.jspdf === 'undefined') {
+                    log('❌ jsPDF library not loaded');
+                    return;
+                }
+                
+                if (typeof html2canvas === 'undefined') {
+                    log('❌ html2canvas library not loaded');
+                    return;
+                }
+                
+                log('✅ Libraries loaded successfully');
+                
+                // Check if PDFGenerator is available
+                if (typeof window.PDFGenerator === 'undefined') {
+                    log('❌ PDFGenerator not available');
+                    return;
+                }
+                
+                log('✅ PDFGenerator available');
+                
+                // Initialize PDFGenerator
+                const pdfGenerator = new window.PDFGenerator();
+                await pdfGenerator.initializeLibraries();
+                log('✅ PDFGenerator initialized');
+                
+                // Get test content
+                const element = document.getElementById('testContent');
+                log(`📄 Test content element: ${element ? 'Found' : 'Not found'}`);
+                log(`📄 Content length: ${element.innerHTML.length}`);
+                log(`📄 Element dimensions: ${element.scrollWidth}x${element.scrollHeight}`);
+                
+                // Generate PDF
+                const options = {
+                    filename: 'simple-test-report.pdf',
+                    format: 'a4',
+                    margin: 15,
+                    quality: 0.95,
+                    headerHeight: 30,
+                    footerHeight: 20
+                };
+                
+                log('🔄 Generating PDF...');
+                const result = await pdfGenerator.generatePDFFromElement(element, options);
+                
+                if (result && result.pdf) {
+                    log('✅ PDF generated successfully');
+                    result.pdf.save(options.filename);
+                    log(`📁 PDF saved as: ${options.filename}`);
+                } else {
+                    log('❌ PDF generation failed');
+                }
+                
+            } catch (error) {
+                log(`❌ Error: ${error.message}`);
+                console.error('Test error:', error);
+            }
+        }
+        
+        // Test advanced PDF generation
+        async function testAdvancedPDF() {
+            log('🧪 Starting advanced PDF test...');
+            
+            try {
+                const element = document.getElementById('testContent');
+                
+                // Use html2canvas directly
+                log('🔄 Generating canvas with html2canvas...');
+                const canvas = await html2canvas(element, {
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: '#ffffff',
+                    logging: true
+                });
+                
+                log(`✅ Canvas generated: ${canvas.width}x${canvas.height}`);
+                
+                // Check if canvas has content
+                const ctx = canvas.getContext('2d');
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const hasContent = imageData.data.some(pixel => pixel !== 0);
+                log(`📊 Canvas has content: ${hasContent}`);
+                
+                if (hasContent) {
+                    // Create PDF with jsPDF
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    
+                    const pageWidth = pdf.internal.pageSize.getWidth();
+                    const pageHeight = pdf.internal.pageSize.getHeight();
+                    const margin = 15;
+                    const contentWidth = pageWidth - (margin * 2);
+                    
+                    const imgWidth = contentWidth;
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                    
+                    log(`📄 PDF dimensions: ${pageWidth}x${pageHeight}mm`);
+                    log(`📄 Image dimensions: ${imgWidth}x${imgHeight}mm`);
+                    
+                    // Add image to PDF
+                    pdf.addImage(
+                        canvas.toDataURL('image/jpeg', 0.95),
+                        'JPEG',
+                        margin,
+                        margin,
+                        imgWidth,
+                        imgHeight
+                    );
+                    
+                    // Save PDF
+                    const filename = 'advanced-test-report.pdf';
+                    pdf.save(filename);
+                    log(`📁 PDF saved as: ${filename}`);
+                } else {
+                    log('❌ Canvas is empty - cannot generate PDF');
+                }
+                
+            } catch (error) {
+                log(`❌ Error: ${error.message}`);
+                console.error('Advanced test error:', error);
+            }
+        }
+        
+        // Initialize
+        log('🚀 Simple PDF Test initialized');
+        log('📋 Available functions: testSimplePDF(), testAdvancedPDF()');
+    </script>
+</body>
+</html> 

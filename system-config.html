@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Configuration - IRIAS Ironworks</title>
+    <link rel="stylesheet" href="/shared-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* System Configuration specific styles */
+        .config-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: var(--spacing-8);
+        }
+        
+        .config-section {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            margin-bottom: var(--spacing-8);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+        
+        .config-header {
+            background: var(--gradient-primary);
+            color: var(--white);
+            padding: var(--spacing-8);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-4);
+        }
+        
+        .config-header h2 {
+            margin: 0;
+            font-size: var(--font-size-2xl);
+            font-weight: 700;
+        }
+        
+        .config-header i {
+            font-size: 2rem;
+        }
+        
+        .config-content {
+            padding: var(--spacing-8);
+        }
+        
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: var(--spacing-6);
+        }
+        
+        .config-item {
+            background: var(--very-light-gray);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-6);
+            border-left: 4px solid var(--primary-red);
+            transition: all 0.3s ease;
+        }
+        
+        .config-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .config-item h3 {
+            margin: 0 0 var(--spacing-4) 0;
+            color: var(--black);
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-3);
+        }
+        
+        .config-item h3 i {
+            color: var(--primary-red);
+        }
+        
+        .form-group {
+            margin-bottom: var(--spacing-4);
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: var(--spacing-2);
+            font-weight: 600;
+            color: var(--dark-gray);
+            font-size: var(--font-size-sm);
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: var(--spacing-3);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius);
+            font-size: var(--font-size-base);
+            transition: all 0.3s ease;
+            background: var(--white);
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-red);
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        .form-group small {
+            color: var(--medium-gray);
+            font-size: var(--font-size-sm);
+            margin-top: var(--spacing-1);
+            display: block;
+        }
+        
+        .config-actions {
+            display: flex;
+            gap: var(--spacing-4);
+            margin-top: var(--spacing-6);
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: var(--spacing-3) var(--spacing-6);
+            border: none;
+            border-radius: var(--radius-lg);
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-2);
+            text-decoration: none;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: var(--white);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .btn-secondary {
+            background: var(--medium-gray);
+            color: var(--white);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--dark-gray);
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background: var(--success-color);
+            color: var(--white);
+        }
+        
+        .btn-success:hover {
+            background: var(--success-dark);
+            transform: translateY(-2px);
+        }
+        
+        .btn-warning {
+            background: var(--warning-color);
+            color: var(--black);
+        }
+        
+        .btn-warning:hover {
+            background: var(--warning-dark);
+            transform: translateY(-2px);
+        }
+        
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-2);
+            padding: var(--spacing-2) var(--spacing-3);
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+        }
+        
+        .status-active {
+            background: var(--success-light);
+            color: var(--success-dark);
+        }
+        
+        .status-inactive {
+            background: var(--error-light);
+            color: var(--error-dark);
+        }
+        
+        .status-warning {
+            background: var(--warning-light);
+            color: var(--warning-dark);
+        }
+        
+        .config-info {
+            background: var(--info-light);
+            border: 1px solid var(--info-color);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-4);
+            margin-bottom: var(--spacing-6);
+        }
+        
+        .config-info h4 {
+            margin: 0 0 var(--spacing-3) 0;
+            color: var(--info-dark);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-2);
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+        }
+        
+        .config-info p {
+            margin: 0;
+            color: var(--dark-gray);
+            line-height: 1.6;
+        }
+        
+        .test-section {
+            background: var(--very-light-gray);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-6);
+            margin-top: var(--spacing-6);
+        }
+        
+        .test-section h4 {
+            margin: 0 0 var(--spacing-4) 0;
+            color: var(--black);
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+        }
+        
+        .test-result {
+            padding: var(--spacing-3);
+            border-radius: var(--radius);
+            margin-top: var(--spacing-3);
+            font-weight: 500;
+        }
+        
+        .test-success {
+            background: var(--success-light);
+            color: var(--success-dark);
+            border: 1px solid var(--success-color);
+        }
+        
+        .test-error {
+            background: var(--error-light);
+            color: var(--error-dark);
+            border: 1px solid var(--error-color);
+        }
+        
+        .test-warning {
+            background: var(--warning-light);
+            color: var(--warning-dark);
+            border: 1px solid var(--warning-color);
+        }
+        
+        /* Enhanced page header */
+        .page-header {
+            text-align: center;
+            margin-bottom: var(--spacing-12);
+            padding: var(--spacing-8) 0;
+        }
+        
+        .page-header h1 {
+            font-size: var(--font-size-4xl);
+            font-weight: 800;
+            color: var(--black);
+            margin-bottom: var(--spacing-4);
+            letter-spacing: -0.02em;
+        }
+        
+        .page-header p {
+            font-size: var(--font-size-xl);
+            color: var(--medium-gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Navigation active state */
+        .nav-link.active {
+            background: var(--primary-red);
+            color: var(--white);
+        }
+        
+        .nav-link.active:hover {
+            background: var(--primary-dark);
+        }
+        
+        /* Password input group styles */
+        .password-input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        
+        .password-input-group input {
+            flex: 1;
+            padding-right: 50px;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--medium-gray);
+            cursor: pointer;
+            padding: 5px;
+            border-radius: var(--radius);
+            transition: color 0.3s ease;
+        }
+        
+        .password-toggle:hover {
+            color: var(--primary-red);
+        }
+        
+        .help-link {
+            color: var(--primary-red);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .help-link:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+        
+        /* Enhanced form styles */
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--primary-red);
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+            outline: none;
+        }
+        
+        .form-group small {
+            color: var(--medium-gray);
+            font-size: var(--font-size-sm);
+            margin-top: var(--spacing-1);
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            .config-container {
+                padding: var(--spacing-4);
+            }
+            
+            .config-content {
+                padding: var(--spacing-6);
+            }
+            
+            .config-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .config-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .page-header h1 {
+                font-size: var(--font-size-3xl);
+            }
+            
+            .page-header p {
+                font-size: var(--font-size-lg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Enhanced Navigation -->
+    <nav class="top-nav">
+        <div class="nav-container">
+            <div class="brand">
+                <i class="fas fa-shield-alt"></i>
+                <div class="brand-text">
+                    <div class="brand-title">My Portal</div>
+                    <div class="brand-subtitle">by 2Knock Media group</div>
+                </div>
+            </div>
+            <div class="nav-links" id="navLinks">
+                <a href="/business-portal.html" class="nav-link">
+                    <i class="fas fa-home"></i> Home
+                </a>
+                <a href="/dashboard-clientes.html" class="nav-link">
+                    <i class="fas fa-users"></i> Clients
+                </a>
+                <a href="/customer-onboarding.html" class="nav-link">
+                    <i class="fas fa-user-plus"></i> Add Client
+                </a>
+                <a href="/fire_escapes_rp.html" class="nav-link">
+                    <i class="fas fa-file-alt"></i> Reports
+                </a>
+                <a href="/system-config.html" class="nav-link active">
+                    <i class="fas fa-cogs"></i> System Config
+                </a>
+            </div>
+            <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <div class="config-container">
+        <div class="page-header">
+            <h1><i class="fas fa-cogs"></i> System Configuration</h1>
+            <p>Manage all system settings and integrations</p>
+        </div>
+
+        <!-- Email Configuration -->
+        <div class="config-section">
+            <div class="config-header">
+                <i class="fas fa-envelope"></i>
+                <h2>Email Notifications</h2>
+            </div>
+            <div class="config-content">
+                <div class="config-info">
+                    <h4><i class="fas fa-info-circle"></i> Email Notification Settings</h4>
+                    <p>Configure email notifications for new customer leads. The system will send notifications to the specified email address whenever a new client is registered.</p>
+                </div>
+                
+                <div class="config-grid">
+                    <div class="config-item">
+                        <h3><i class="fas fa-envelope-open"></i> Gmail Configuration</h3>
+                        <div class="form-group">
+                            <label for="gmailUser">Gmail Address</label>
+                            <input type="email" id="gmailUser" placeholder="david@iriasironworks.com">
+                            <small>The Gmail address that will send notifications</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="gmailAppPassword">Gmail App Password</label>
+                            <div class="password-input-group">
+                                <input type="password" id="gmailAppPassword" placeholder="Enter your Gmail App Password">
+                                <button type="button" class="password-toggle" onclick="togglePassword('gmailAppPassword')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <small>
+                                <a href="https://support.google.com/accounts/answer/185833" target="_blank" class="help-link">
+                                    <i class="fas fa-question-circle"></i> How to create Gmail App Password
+                                </a>
+                            </small>
+                        </div>
+                        <div class="form-group">
+                            <label for="emailFromName">From Name (Optional)</label>
+                            <input type="text" id="emailFromName" placeholder="IRIAS Ironworks">
+                            <small>The name that will appear as sender</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="ccEmail">CC Email (Optional)</label>
+                            <input type="email" id="ccEmail" placeholder="manager@company.com">
+                            <small>Send a copy of notifications to this email address</small>
+                        </div>
+                        <div class="config-actions">
+                            <button class="btn btn-secondary" onclick="saveGmailConfig()">
+                                <i class="fas fa-save"></i> Save Gmail Config
+                            </button>
+                            <button class="btn btn-primary" onclick="testGmailConfig()">
+                                <i class="fas fa-paper-plane"></i> Test Gmail
+                            </button>
+                        </div>
+                        <div id="gmailTestSection" class="test-section" style="display: none;">
+                            <h4>Gmail Test Results</h4>
+                            <div id="gmailTestResult"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="test-section" id="emailTestSection" style="display: none;">
+                    <h4><i class="fas fa-flask"></i> Email Test Results</h4>
+                    <div id="emailTestResult"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Zoho Flow Configuration -->
+        <div class="config-section">
+            <div class="config-header">
+                <i class="fas fa-project-diagram"></i>
+                <h2>Zoho Flow Integration</h2>
+            </div>
+            <div class="config-content">
+                <div class="config-info">
+                    <h4><i class="fas fa-info-circle"></i> Zoho Flow Webhook Configuration</h4>
+                    <p>Configure Zoho Flow webhook to automatically create clients in your Zoho systems when new leads are registered. You'll need to create a webhook in Zoho Flow and provide the URL here.</p>
+                </div>
+                
+                <div class="config-grid">
+                    <div class="config-item">
+                        <h3><i class="fas fa-link"></i> Webhook Configuration</h3>
+                        <div class="form-group">
+                            <label for="zohoWebhookUrl">Zoho Flow Webhook URL</label>
+                            <input type="url" id="zohoWebhookUrl" placeholder="https://your-zoho-flow-webhook-url.com/webhook">
+                            <small>Enter the webhook URL from your Zoho Flow configuration</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="zohoWebhookSecret">Webhook Secret (Optional)</label>
+                            <input type="password" id="zohoWebhookSecret" placeholder="Enter webhook secret for security">
+                        </div>
+                        <div class="config-actions">
+                            <button class="btn btn-primary" onclick="saveZohoConfig()">
+                                <i class="fas fa-save"></i> Save Zoho Settings
+                            </button>
+                            <button class="btn btn-warning" onclick="testZohoConfig()">
+                                <i class="fas fa-paper-plane"></i> Test Webhook
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="config-item">
+                        <h3><i class="fas fa-map"></i> Data Mapping</h3>
+                        <div class="form-group">
+                            <label for="zohoDataMapping">Custom Data Mapping (JSON)</label>
+                            <textarea id="zohoDataMapping" placeholder='{
+  "client_name": "clientFullName",
+  "client_email": "email",
+  "client_phone": "phone",
+  "service_type": "serviceType"
+}'>{
+  "client_name": "clientFullName",
+  "client_email": "email", 
+  "client_phone": "customerPhoneNumber",
+  "client_address": "address",
+  "service_type": "serviceType",
+  "customer_type": "customerType",
+  "price": "price",
+  "customer_status": "customerStatus",
+  "registration_date": "timestamp",
+  "source": "Web Form"
+}</textarea>
+                            <small>Customize how data is mapped to Zoho Flow fields</small>
+                        </div>
+                        <div class="config-actions">
+                            <button class="btn btn-secondary" onclick="saveDataMapping()">
+                                <i class="fas fa-save"></i> Save Mapping
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="test-section" id="zohoTestSection" style="display: none;">
+                    <h4><i class="fas fa-flask"></i> Zoho Flow Test Results</h4>
+                    <div id="zohoTestResult"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Settings -->
+        <div class="config-section">
+            <div class="config-header">
+                <i class="fas fa-server"></i>
+                <h2>System Settings</h2>
+            </div>
+            <div class="config-content">
+                <div class="config-grid">
+                    <div class="config-item">
+                        <h3><i class="fas fa-database"></i> Google Sheets Configuration</h3>
+                        <div class="form-group">
+                            <label for="googleSheetsId">Google Sheets ID</label>
+                            <input type="text" id="googleSheetsId" placeholder="13Fld-uJgwWuJVVxyEJoB9h7zAVbN2HlizV5udmT5XZU">
+                        </div>
+                        <div class="form-group">
+                            <label for="googleSheetsRange">Sheet Range</label>
+                            <input type="text" id="googleSheetsRange" placeholder="Form Responses 1!A:AA">
+                        </div>
+                        <div class="config-actions">
+                            <button class="btn btn-primary" onclick="saveGoogleSheetsConfig()">
+                                <i class="fas fa-save"></i> Save Sheets Config
+                            </button>
+                            <button class="btn btn-secondary" onclick="testGoogleSheetsConnection()">
+                                <i class="fas fa-check"></i> Test Connection
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="config-item">
+                        <h3><i class="fas fa-shield-alt"></i> Security Settings</h3>
+                        <div class="form-group">
+                            <label for="sessionTimeout">Session Timeout (minutes)</label>
+                            <input type="number" id="sessionTimeout" placeholder="1440" min="15" max="10080">
+                        </div>
+                        <div class="form-group">
+                            <label for="maxLoginAttempts">Max Login Attempts</label>
+                            <input type="number" id="maxLoginAttempts" placeholder="5" min="3" max="10">
+                        </div>
+                        <div class="config-actions">
+                            <button class="btn btn-primary" onclick="saveSecurityConfig()">
+                                <i class="fas fa-save"></i> Save Security Settings
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Backup & Export -->
+        <div class="config-section">
+            <div class="config-header">
+                <i class="fas fa-download"></i>
+                <h2>Backup & Export</h2>
+            </div>
+            <div class="config-content">
+                <div class="config-grid">
+                    <div class="config-item">
+                        <h3><i class="fas fa-download"></i> Export Configuration</h3>
+                        <p>Export all current system configurations to a JSON file for backup or migration purposes.</p>
+                        <div class="config-actions">
+                            <button class="btn btn-success" onclick="exportConfig()">
+                                <i class="fas fa-download"></i> Export Config
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="config-item">
+                        <h3><i class="fas fa-upload"></i> Import Configuration</h3>
+                        <div class="form-group">
+                            <label for="configFile">Configuration File</label>
+                            <input type="file" id="configFile" accept=".json">
+                        </div>
+                        <div class="config-actions">
+                            <button class="btn btn-warning" onclick="importConfig()">
+                                <i class="fas fa-upload"></i> Import Config
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Status -->
+        <div class="config-section">
+            <div class="config-header">
+                <i class="fas fa-chart-line"></i>
+                <h2>System Status</h2>
+            </div>
+            <div class="config-content">
+                <div class="config-grid">
+                    <div class="config-item">
+                        <h3><i class="fas fa-heartbeat"></i> Service Status</h3>
+                        <div id="serviceStatus">
+                            <p><strong>Email Service:</strong> <span class="status-indicator status-active">Active</span></p>
+                            <p><strong>Zoho Flow:</strong> <span class="status-indicator status-warning">Not Configured</span></p>
+                            <p><strong>Google Sheets:</strong> <span class="status-indicator status-active">Connected</span></p>
+                        </div>
+                        <div class="config-actions">
+                            <button class="btn btn-secondary" onclick="refreshStatus()">
+                                <i class="fas fa-sync"></i> Refresh Status
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="config-item">
+                        <h3><i class="fas fa-info-circle"></i> System Information</h3>
+                        <div id="systemInfo">
+                            <p><strong>Version:</strong> 1.0.0</p>
+                            <p><strong>Last Updated:</strong> <span id="lastUpdated">Loading...</span></p>
+                            <p><strong>Environment:</strong> <span id="environment">Development</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <i class="fas fa-shield-alt"></i>
+                <div class="footer-brand-text">
+                    <div class="footer-brand-title">My Portal</div>
+                    <div class="footer-brand-subtitle">by 2Knock Media group</div>
+                </div>
+            </div>
+            <p class="footer-text">Professional fire safety management platform designed for modern businesses.</p>
+            <div class="footer-links">
+                <a href="/business-portal.html" class="footer-link">Home</a>
+                <a href="/dashboard-clientes.html" class="footer-link">Clients</a>
+                <a href="/customer-onboarding.html" class="footer-link">Onboarding</a>
+                <a href="/fire_escapes_rp.html" class="footer-link">Reports</a>
+                <a href="/system-config.html" class="footer-link">System Config</a>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 My Portal by 2Knock Media group. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/shared-scripts.js"></script>
+    <script>
+        class SystemConfigManager {
+            constructor() {
+                this.config = {};
+                this.init();
+            }
+
+            async init() {
+                await this.loadConfig();
+                this.setupEventListeners();
+                this.updateSystemInfo();
+            }
+
+            async loadConfig() {
+                try {
+                    const response = await fetch('/api/system-config');
+                    if (response.ok) {
+                        this.config = await response.json();
+                        this.populateFormFields();
+                    } else {
+                        console.warn('Could not load system config, using defaults');
+                        this.loadDefaultConfig();
+                    }
+                } catch (error) {
+                    console.error('Error loading config:', error);
+                    this.loadDefaultConfig();
+                }
+            }
+
+            loadDefaultConfig() {
+                this.config = {
+                    notifications: {
+                        email: 'david@iriasironworks.com',
+                        password: '',
+                        emailFromName: 'IRIAS Ironworks',
+                        service: 'gmail'
+                    },
+                    zoho: {
+                        webhookUrl: 'https://flow.zoho.com/846023856/flow/webhook/incoming?zapikey=1001.ac69abe13a6d0b883c071f938aa8dbb9.fe7df870e542cee1fc5e31aabe1c5028&isdebug=false',
+                        webhookSecret: '',
+                        dataMapping: {
+                            client_name: "clientFullName",
+                            client_email: "email",
+                            client_phone: "customerPhoneNumber",
+                            client_address: "address",
+                            service_type: "serviceType",
+                            customer_type: "customerType",
+                            price: "price",
+                            customer_status: "customerStatus",
+                            registration_date: "timestamp",
+                            source: "Web Form"
+                        }
+                    },
+                    googleSheets: {
+                        spreadsheetId: '13Fld-uJgwWuJVVxyEJoB9h7zAVbN2HlizV5udmT5XZU',
+                        range: 'Form Responses 1!A:AA'
+                    },
+                    security: {
+                        sessionTimeout: 1440,
+                        maxLoginAttempts: 5
+                    }
+                };
+                this.populateFormFields();
+            }
+
+            populateFormFields() {
+                // Gmail Configuration
+                document.getElementById('gmailUser').value = this.config.notifications?.email || 'david@iriasironworks.com';
+                document.getElementById('gmailAppPassword').value = this.config.notifications?.password || '';
+                document.getElementById('emailFromName').value = this.config.notifications?.emailFromName || 'IRIAS Ironworks';
+                document.getElementById('ccEmail').value = this.config.notifications?.ccEmail || '';
+
+                // Zoho Configuration
+                document.getElementById('zohoWebhookUrl').value = this.config.zoho?.webhookUrl || 'https://flow.zoho.com/846023856/flow/webhook/incoming?zapikey=1001.ac69abe13a6d0b883c071f938aa8dbb9.fe7df870e542cee1fc5e31aabe1c5028&isdebug=false';
+                document.getElementById('zohoWebhookSecret').value = this.config.zoho?.webhookSecret || '';
+                document.getElementById('zohoDataMapping').value = JSON.stringify(this.config.zoho?.dataMapping || {}, null, 2);
+
+                // Google Sheets Configuration
+                document.getElementById('googleSheetsId').value = this.config.googleSheets?.spreadsheetId || '13Fld-uJgwWuJVVxyEJoB9h7zAVbN2HlizV5XZU';
+                document.getElementById('googleSheetsRange').value = this.config.googleSheets?.range || 'Form Responses 1!A:AA';
+
+                // Security Configuration
+                document.getElementById('sessionTimeout').value = this.config.security?.sessionTimeout || 1440;
+                document.getElementById('maxLoginAttempts').value = this.config.security?.maxLoginAttempts || 5;
+            }
+
+            setupEventListeners() {
+                // Add any additional event listeners here
+            }
+
+            async saveConfig() {
+                try {
+                    const response = await fetch('/api/system-config', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(this.config)
+                    });
+
+                    if (response.ok) {
+                        this.showNotification('✅ Configuration saved successfully!', 'success');
+                    } else {
+                        throw new Error('Failed to save configuration');
+                    }
+                } catch (error) {
+                    console.error('Error saving config:', error);
+                    this.showNotification('❌ Error saving configuration', 'error');
+                }
+            }
+
+            showNotification(message, type = 'info') {
+                if (window.showNotification) {
+                    window.showNotification(message, type);
+                } else {
+                    alert(message);
+                }
+            }
+
+            updateSystemInfo() {
+                document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+                document.getElementById('environment').textContent = window.location.hostname === 'localhost' ? 'Development' : 'Production';
+            }
+        }
+
+        // Global functions for button actions
+        const configManager = new SystemConfigManager();
+
+
+
+        // Toggle password visibility
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const button = input.parentNode.querySelector('.password-toggle i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                button.className = 'fas fa-eye-slash';
+            } else {
+                input.type = 'password';
+                button.className = 'fas fa-eye';
+            }
+        }
+
+        async function saveGmailConfig() {
+            const gmailUser = document.getElementById('gmailUser').value;
+            const gmailAppPassword = document.getElementById('gmailAppPassword').value;
+            const emailFromName = document.getElementById('emailFromName').value;
+            const ccEmail = document.getElementById('ccEmail').value;
+            
+            if (!gmailUser || !gmailAppPassword) {
+                configManager.showNotification('❌ Gmail address and App Password are required', 'error');
+                return;
+            }
+            
+            // Ensure config is initialized
+            if (!configManager.config.notifications) {
+                configManager.config.notifications = {};
+            }
+            
+            // Update notifications configuration
+            configManager.config.notifications.email = gmailUser;
+            configManager.config.notifications.password = gmailAppPassword;
+            configManager.config.notifications.emailFromName = emailFromName;
+            configManager.config.notifications.ccEmail = ccEmail;
+            configManager.config.notifications.service = 'gmail';
+            
+            await configManager.saveConfig();
+            configManager.showNotification('✅ Gmail configuration saved successfully!', 'success');
+        }
+
+        async function testGmailConfig() {
+            const testSection = document.getElementById('gmailTestSection');
+            const testResult = document.getElementById('gmailTestResult');
+            
+            const gmailUser = document.getElementById('gmailUser').value;
+            const gmailAppPassword = document.getElementById('gmailAppPassword').value;
+            
+            if (!gmailUser || !gmailAppPassword) {
+                testResult.innerHTML = '<div class="test-error">❌ Please fill in Gmail address and App Password first</div>';
+                testSection.style.display = 'block';
+                return;
+            }
+            
+            testSection.style.display = 'block';
+            testResult.innerHTML = '<div class="test-warning">Testing Gmail configuration...</div>';
+
+            try {
+                const response = await fetch('/api/test-email', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: gmailUser,
+                        service: 'gmail',
+                        gmailAppPassword: gmailAppPassword
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    testResult.innerHTML = '<div class="test-success">✅ Gmail test successful! Check your inbox.</div>';
+                } else {
+                    const errorMessage = result.details || result.message || 'Unknown error';
+                    testResult.innerHTML = `<div class="test-error">❌ Gmail test failed: ${errorMessage}</div>`;
+                }
+            } catch (error) {
+                testResult.innerHTML = `<div class="test-error">❌ Gmail test failed: ${error.message}</div>`;
+            }
+        }
+
+        async function testEmailConfig() {
+            const testSection = document.getElementById('emailTestSection');
+            const testResult = document.getElementById('emailTestResult');
+            
+            testSection.style.display = 'block';
+            testResult.innerHTML = '<div class="test-warning">Testing email configuration...</div>';
+
+            try {
+                const response = await fetch('/api/test-email', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: document.getElementById('notificationEmail').value,
+                        service: document.getElementById('emailService').value,
+                        apiKey: document.getElementById('emailApiKey').value
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    testResult.innerHTML = '<div class="test-success">✅ Email test successful! Check your inbox.</div>';
+                } else {
+                    testResult.innerHTML = `<div class="test-error">❌ Email test failed: ${result.message}</div>`;
+                }
+            } catch (error) {
+                testResult.innerHTML = `<div class="test-error">❌ Email test failed: ${error.message}</div>`;
+            }
+        }
+
+        async function saveZohoConfig() {
+            // Ensure config is initialized
+            if (!configManager.config.zoho) {
+                configManager.config.zoho = {};
+            }
+            configManager.config.zoho.webhookUrl = document.getElementById('zohoWebhookUrl').value;
+            configManager.config.zoho.webhookSecret = document.getElementById('zohoWebhookSecret').value;
+            await configManager.saveConfig();
+        }
+
+        async function saveDataMapping() {
+            try {
+                // Ensure config is initialized
+                if (!configManager.config.zoho) {
+                    configManager.config.zoho = {};
+                }
+                const mappingText = document.getElementById('zohoDataMapping').value;
+                configManager.config.zoho.dataMapping = JSON.parse(mappingText);
+                await configManager.saveConfig();
+                configManager.showNotification('✅ Data mapping saved successfully!', 'success');
+            } catch (error) {
+                configManager.showNotification('❌ Invalid JSON format in data mapping', 'error');
+            }
+        }
+
+        async function testZohoConfig() {
+            const testSection = document.getElementById('zohoTestSection');
+            const testResult = document.getElementById('zohoTestResult');
+            
+            const webhookUrl = document.getElementById('zohoWebhookUrl').value;
+            
+            if (!webhookUrl) {
+                testResult.innerHTML = '<div class="test-error">❌ Please fill in Zoho webhook URL first</div>';
+                testSection.style.display = 'block';
+                return;
+            }
+            
+            testSection.style.display = 'block';
+            testResult.innerHTML = '<div class="test-warning">Testing Zoho Flow webhook...</div>';
+
+            try {
+                const response = await fetch('/api/test-zoho', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        webhookUrl: webhookUrl,
+                        webhookSecret: document.getElementById('zohoWebhookSecret').value
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    testResult.innerHTML = '<div class="test-success">✅ Zoho Flow webhook test successful!</div>';
+                } else {
+                    const errorMessage = result.details || result.message || 'Unknown error';
+                    testResult.innerHTML = `<div class="test-error">❌ Zoho Flow test failed: ${errorMessage}</div>`;
+                }
+            } catch (error) {
+                testResult.innerHTML = `<div class="test-error">❌ Zoho Flow test failed: ${error.message}</div>`;
+            }
+        }
+
+        async function saveGoogleSheetsConfig() {
+            // Ensure config is initialized
+            if (!configManager.config.googleSheets) {
+                configManager.config.googleSheets = {};
+            }
+            configManager.config.googleSheets.spreadsheetId = document.getElementById('googleSheetsId').value;
+            configManager.config.googleSheets.range = document.getElementById('googleSheetsRange').value;
+            await configManager.saveConfig();
+        }
+
+        async function testGoogleSheetsConnection() {
+            try {
+                const response = await fetch('/api/test-google-sheets');
+                const result = await response.json();
+                
+                if (result.success) {
+                    configManager.showNotification('✅ Google Sheets connection successful!', 'success');
+                } else {
+                    configManager.showNotification(`❌ Google Sheets test failed: ${result.message}`, 'error');
+                }
+            } catch (error) {
+                configManager.showNotification(`❌ Google Sheets test failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function saveSecurityConfig() {
+            // Ensure config is initialized
+            if (!configManager.config.security) {
+                configManager.config.security = {};
+            }
+            configManager.config.security.sessionTimeout = parseInt(document.getElementById('sessionTimeout').value);
+            configManager.config.security.maxLoginAttempts = parseInt(document.getElementById('maxLoginAttempts').value);
+            await configManager.saveConfig();
+        }
+
+        async function exportConfig() {
+            const configData = JSON.stringify(configManager.config, null, 2);
+            const blob = new Blob([configData], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `system-config-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            configManager.showNotification('✅ Configuration exported successfully!', 'success');
+        }
+
+        async function importConfig() {
+            const fileInput = document.getElementById('configFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                configManager.showNotification('❌ Please select a configuration file', 'error');
+                return;
+            }
+
+            try {
+                const text = await file.text();
+                const importedConfig = JSON.parse(text);
+                
+                // Validate the imported config
+                if (importedConfig.email && importedConfig.zoho && importedConfig.googleSheets) {
+                    configManager.config = importedConfig;
+                    configManager.populateFormFields();
+                    await configManager.saveConfig();
+                    configManager.showNotification('✅ Configuration imported successfully!', 'success');
+                } else {
+                    throw new Error('Invalid configuration format');
+                }
+            } catch (error) {
+                configManager.showNotification(`❌ Error importing configuration: ${error.message}`, 'error');
+            }
+        }
+
+        async function refreshStatus() {
+            try {
+                const response = await fetch('/api/system-status');
+                const status = await response.json();
+                
+                const serviceStatus = document.getElementById('serviceStatus');
+                serviceStatus.innerHTML = `
+                    <p><strong>Email Service:</strong> <span class="status-indicator ${status.data?.email?.configured ? 'status-active' : 'status-inactive'}">${status.data?.email?.configured ? 'Configured' : 'Not Configured'}</span></p>
+                    <p><strong>Zoho Flow:</strong> <span class="status-indicator ${status.data?.zoho?.configured ? 'status-active' : 'status-warning'}">${status.data?.zoho?.configured ? 'Configured' : 'Not Configured'}</span></p>
+                    <p><strong>Google Sheets:</strong> <span class="status-indicator ${status.data?.googleSheets?.configured ? 'status-active' : 'status-inactive'}">${status.data?.googleSheets?.configured ? 'Connected (' + (status.data?.googleSheets?.clientCount || 0) + ' clients)' : 'Disconnected'}</span></p>
+                    <p><strong>Last Updated:</strong> <span>${new Date().toLocaleString()}</span></p>
+                `;
+                
+                configManager.showNotification('✅ Status refreshed!', 'success');
+            } catch (error) {
+                configManager.showNotification('❌ Error refreshing status', 'error');
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('System Configuration page loaded');
+            // Load initial status
+            setTimeout(() => {
+                refreshStatus();
+            }, 1000);
+        });
+    </script>
+</body>
+</html> 

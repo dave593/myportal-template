@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <title>👥 My Portal - Client Management Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="shared-styles.css">
+    <style>
+        /* Dashboard-specific styles */
+        .hero-section {
+            background: var(--gradient-primary);
+            color: var(--white);
+        }
+
+        .hero-subtitle {
+            color: var(--white) !important;
+            opacity: 1 !important;
+        }
+
+        .hero-title {
+            color: var(--white) !important;
+        }
+
+        .hero-content {
+            color: var(--white) !important;
+            padding: 0 var(--spacing-6);
+        }
+
+        .hero-content p {
+            color: var(--white) !important;
+        }
+
+        /* Enhanced button styles for better visibility */
+        .hero-actions {
+            display: flex;
+            gap: var(--spacing-6);
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .hero-btn {
+            text-align: center;
+            justify-content: center;
+            font-size: var(--font-size-base);
+            font-weight: 600;
+            letter-spacing: 0.025em;
+            min-width: 180px;
+            max-width: 220px;
+            flex: 0 1 auto;
+        }
+
+        .hero-btn i {
+            font-size: 1.1em;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="90" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grain)"/></svg>');
+            pointer-events: none;
+        }
+
+        .hero-btn {
+            background: var(--white);
+            color: var(--primary-red);
+            border: 2px solid var(--white);
+            font-weight: 600;
+            padding: var(--spacing-3) var(--spacing-6);
+            border-radius: var(--radius-lg);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-2);
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-md);
+            min-height: 48px;
+        }
+
+        .hero-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            background: var(--white);
+            color: var(--primary-red);
+        }
+
+        .hero-btn.secondary {
+            background: var(--primary-red);
+            color: var(--white);
+            border: 2px solid var(--white);
+        }
+
+        .hero-btn.secondary:hover {
+            background: var(--dark-red);
+            color: var(--white);
+            border-color: var(--white);
+        }
+
+        /* Controls Section */
+        .controls-section {
+            background: var(--white);
+            padding: var(--spacing-8);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            margin-bottom: var(--spacing-8);
+        }
+
+        .controls-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-8);
+            flex-wrap: wrap;
+            gap: var(--spacing-4);
+        }
+
+        .controls-title {
+            font-size: var(--font-size-2xl);
+            font-weight: 700;
+            color: var(--black);
+        }
+
+        .controls-actions {
+            display: flex;
+            gap: var(--spacing-4);
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            position: relative;
+            min-width: 300px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: var(--spacing-3) var(--spacing-4) var(--spacing-3) 2.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            font-size: var(--font-size-sm);
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-red);
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: var(--spacing-4);
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--light-gray);
+        }
+
+        .filter-select {
+            padding: var(--spacing-3) var(--spacing-4);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            background: var(--white);
+            font-size: var(--font-size-sm);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary-red);
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
+
+        .add-client-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-2);
+            background: var(--gradient-primary);
+            color: var(--white);
+            padding: var(--spacing-3) var(--spacing-6);
+            border: none;
+            border-radius: var(--radius-lg);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .add-client-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Mobile Navigation */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--dark-gray);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: var(--spacing-2);
+            border-radius: var(--radius);
+            transition: all 0.3s ease;
+        }
+
+        .mobile-menu-btn:hover {
+            background: var(--very-light-gray);
+            color: var(--primary-red);
+        }
+
+        /* Mobile-specific navigation styles */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--white);
+                border-top: 1px solid var(--border-color);
+                box-shadow: var(--shadow-lg);
+                flex-direction: column;
+                padding: var(--spacing-4);
+                z-index: 1000;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-link {
+                padding: var(--spacing-3) var(--spacing-4);
+                border-radius: var(--radius);
+                margin-bottom: var(--spacing-2);
+                font-size: var(--font-size-base);
+                font-weight: 500;
+                transition: all 0.3s ease;
+            }
+
+            .nav-link:hover {
+                background: var(--very-light-gray);
+                transform: none;
+            }
+
+            .mobile-menu-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .nav-container {
+                position: relative;
+            }
+        }
+
+        /* Clients Section */
+        .clients-section {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+        }
+
+        .clients-header {
+            padding: var(--spacing-8);
+            border-bottom: 1px solid var(--border-color);
+            background: var(--very-light-gray);
+        }
+
+        .clients-title {
+            font-size: var(--font-size-2xl);
+            font-weight: 700;
+            color: var(--black);
+            margin-bottom: var(--spacing-2);
+        }
+
+        .clients-subtitle {
+            color: var(--medium-gray);
+            font-size: var(--font-size-sm);
+        }
+
+        .clients-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .clients-table th {
+            background: var(--very-light-gray);
+            padding: var(--spacing-4);
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark-gray);
+            border-bottom: 1px solid var(--border-color);
+            font-size: var(--font-size-sm);
+        }
+
+        .clients-table td {
+            padding: var(--spacing-4);
+            border-bottom: 1px solid var(--border-color);
+            font-size: var(--font-size-sm);
+        }
+
+        .clients-table tr:hover {
+            background: var(--very-light-gray);
+        }
+
+        /* Mobile Responsive Improvements */
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 3rem 0;
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+                line-height: 1.2;
+                margin-bottom: var(--spacing-4);
+            }
+
+            .hero-subtitle {
+                font-size: var(--font-size-lg);
+                line-height: 1.6;
+                margin-bottom: var(--spacing-6);
+            }
+
+            .hero-actions {
+                flex-direction: column;
+                gap: var(--spacing-4);
+                width: 100%;
+                max-width: 400px;
+                margin: 0 auto;
+            }
+
+            .hero-btn {
+                width: 100%;
+                max-width: 280px;
+                justify-content: center;
+                min-height: 48px;
+                font-size: var(--font-size-base);
+                font-weight: 600;
+                padding: var(--spacing-3) var(--spacing-4);
+                margin: 0 auto;
+            }
+
+            .hero-btn i {
+                font-size: 1.2em;
+            }
+
+            #refreshBtn {
+                width: 100%;
+                max-width: 200px;
+                margin: 0 auto;
+                justify-content: center;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-4);
+                transform: translateY(-2rem);
+                padding: 0 var(--spacing-4);
+            }
+
+            .stat-card {
+                padding: var(--spacing-6) var(--spacing-4);
+                min-height: 120px;
+            }
+
+            .controls-section {
+                padding: var(--spacing-6);
+                margin-bottom: var(--spacing-6);
+            }
+
+            .controls-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: var(--spacing-4);
+            }
+
+            .controls-title {
+                font-size: var(--font-size-xl);
+                text-align: center;
+            }
+
+            .controls-actions {
+                flex-direction: column;
+                gap: var(--spacing-3);
+            }
+
+            .search-box {
+                min-width: auto;
+                width: 100%;
+            }
+
+            .search-input {
+                width: 100%;
+                padding: var(--spacing-3) var(--spacing-4) var(--spacing-3) 2.5rem;
+                font-size: var(--font-size-base);
+                min-height: 44px;
+            }
+
+            .filter-select {
+                width: 100%;
+                padding: var(--spacing-3) var(--spacing-4);
+                font-size: var(--font-size-base);
+                min-height: 44px;
+            }
+
+            .add-client-btn {
+                width: 100%;
+                justify-content: center;
+                min-height: 44px;
+                font-size: var(--font-size-base);
+            }
+
+            .clients-section {
+                margin: 0 var(--spacing-4);
+            }
+
+            .clients-header {
+                padding: var(--spacing-6);
+            }
+
+            .clients-title {
+                font-size: var(--font-size-xl);
+                text-align: center;
+            }
+
+            .clients-subtitle {
+                text-align: center;
+            }
+
+            /* Mobile table improvements */
+            .clients-table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            .clients-table thead {
+                display: none;
+            }
+
+            .clients-table tbody {
+                display: block;
+            }
+
+            .clients-table tr {
+                display: block;
+                margin-bottom: var(--spacing-4);
+                padding: var(--spacing-4);
+                border: 1px solid var(--border-color);
+                border-radius: var(--radius-lg);
+                background: var(--white);
+                box-shadow: var(--shadow-sm);
+            }
+
+            .clients-table td {
+                display: block;
+                padding: var(--spacing-2) 0;
+                border: none;
+                text-align: left;
+            }
+
+            .clients-table td:before {
+                content: attr(data-label) ": ";
+                font-weight: 600;
+                color: var(--dark-gray);
+                margin-right: var(--spacing-2);
+            }
+
+            .client-actions {
+                display: flex;
+                gap: var(--spacing-2);
+                margin-top: var(--spacing-3);
+                justify-content: center;
+            }
+
+            .action-btn {
+                padding: var(--spacing-2) var(--spacing-3);
+                font-size: var(--font-size-sm);
+                min-height: 36px;
+            }
+        }
+
+        /* Extra Small Mobile Devices */
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .hero-subtitle {
+                font-size: var(--font-size-base);
+            }
+
+            .controls-section {
+                padding: var(--spacing-4);
+            }
+
+            .clients-section {
+                margin: 0 var(--spacing-3);
+            }
+
+            .clients-header {
+                padding: var(--spacing-4);
+            }
+
+            .clients-table tr {
+                padding: var(--spacing-3);
+            }
+
+            .client-actions {
+                flex-direction: column;
+                gap: var(--spacing-2);
+            }
+
+            .action-btn {
+                width: 100%;
+                justify-content: center;
+                min-height: 44px;
+                font-size: var(--font-size-base);
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: var(--spacing-2);
+            }
+        }
+
+        /* Pagination Styles */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: var(--spacing-6);
+            padding: var(--spacing-4);
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .pagination-info {
+            font-size: var(--font-size-sm);
+            color: var(--medium-gray);
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: var(--spacing-2);
+            align-items: center;
+        }
+
+        .pagination-btn {
+            background: var(--white);
+            border: 1px solid var(--light-gray);
+            color: var(--dark-gray);
+            padding: var(--spacing-2) var(--spacing-3);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: var(--font-size-sm);
+            min-width: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: var(--primary-red);
+            color: var(--white);
+            border-color: var(--primary-red);
+        }
+
+        .pagination-btn.active {
+            background: var(--primary-red);
+            color: var(--white);
+            border-color: var(--primary-red);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Refresh Button Hover */
+        #refreshBtn:hover:not(:disabled) {
+            background: var(--dark-red);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        #refreshBtn:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        /* Mobile Pagination */
+        @media (max-width: 768px) {
+            .pagination-container {
+                flex-direction: column;
+                gap: var(--spacing-3);
+                text-align: center;
+            }
+
+            .pagination-controls {
+                justify-content: center;
+            }
+
+            .pagination-btn {
+                min-width: 36px;
+                padding: var(--spacing-2);
+                font-size: var(--font-size-xs);
+            }
+        }
+
+        /* Ultra Small Mobile Devices */
+        @media (max-width: 360px) {
+            .hero-title {
+                font-size: 1.75rem;
+            }
+
+            .hero-subtitle {
+                font-size: var(--font-size-sm);
+            }
+
+            .hero-actions {
+                max-width: 320px;
+                gap: var(--spacing-3);
+            }
+
+            .hero-btn {
+                font-size: var(--font-size-sm);
+                padding: var(--spacing-2) var(--spacing-3);
+                min-height: 44px;
+                max-width: 240px;
+            }
+
+            .controls-section {
+                padding: var(--spacing-3);
+            }
+
+            .clients-section {
+                margin: 0 var(--spacing-2);
+            }
+
+            .clients-header {
+                padding: var(--spacing-3);
+            }
+
+            .clients-table tr {
+                padding: var(--spacing-2);
+            }
+
+            .search-input,
+            .filter-select,
+            .add-client-btn {
+                font-size: var(--font-size-sm);
+                min-height: 40px;
+            }
+        }
+
+        /* Touch-friendly improvements */
+        .nav-link,
+        .hero-btn,
+        .add-client-btn,
+        .action-btn {
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        /* Improved focus states for mobile */
+        .nav-link:focus,
+        .hero-btn:focus,
+        .add-client-btn:focus,
+        .action-btn:focus,
+        .search-input:focus,
+        .filter-select:focus {
+            outline: 2px solid var(--primary-red);
+            outline-offset: 2px;
+        }
+
+        /* Prevent text selection on interactive elements */
+        .stat-card,
+        .action-card {
+            user-select: none;
+        }
+
+        /* Smooth scrolling for mobile */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Prevent horizontal scroll on mobile */
+        body {
+            overflow-x: hidden;
+        }
+
+        /* High DPI Mobile Devices */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .hero-btn,
+            .add-client-btn,
+            .action-btn,
+            .nav-link {
+                border-width: 0.5px;
+            }
+        }
+
+        /* Reduced Motion for Accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            .hero-btn,
+            .add-client-btn,
+            .action-btn,
+            .stat-card {
+                transition: none;
+            }
+
+            .hero-btn:hover,
+            .add-client-btn:hover,
+            .action-btn:hover,
+            .stat-card:hover {
+                transform: none;
+            }
+        }
+
+        .client-name {
+            font-weight: 600;
+            color: var(--black);
+        }
+
+        .client-email {
+            color: var(--primary-red);
+            text-decoration: none;
+        }
+
+        .client-email:hover {
+            text-decoration: underline;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: var(--spacing-2);
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: var(--spacing-2) var(--spacing-3);
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: var(--font-size-sm);
+            min-width: 36px;
+            min-height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+        }
+
+        .action-btn.update {
+            background: #3b82f6;
+            color: var(--white);
+        }
+
+        .action-btn.status {
+            background: #10b981;
+            color: var(--white);
+        }
+
+        .action-btn.calendar {
+            background: #8b5cf6;
+            color: var(--white);
+        }
+
+        .action-btn.report {
+            background: #f59e0b;
+            color: var(--white);
+        }
+
+        .action-btn.call {
+            background: #10b981;
+            color: var(--white);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .action-btn.update:hover {
+            background: #2563eb;
+        }
+
+        .action-btn.status:hover {
+            background: #059669;
+        }
+
+        .action-btn.calendar:hover {
+            background: #7c3aed;
+        }
+
+        .action-btn.report:hover {
+            background: #d97706;
+        }
+
+        .action-btn.call:hover {
+            background: #059669;
+        }
+
+        /* Status Badge Styles */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-1);
+            padding: var(--spacing-1) var(--spacing-2);
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-xs);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        .status-badge i {
+            font-size: 0.5em;
+        }
+
+        .status-badge.status-active {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-badge.status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-badge.status-inactive {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-badge.status-contacted {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--light-gray);
+            border-radius: 50%;
+            border-top-color: var(--primary-red);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Modal animations */
+        @keyframes modalSlideIn {
+            from { 
+                transform: translateY(-50px) scale(0.95); 
+                opacity: 0; 
+            }
+            to { 
+                transform: translateY(0) scale(1); 
+                opacity: 1; 
+            }
+        }
+
+        @keyframes modalSlideOut {
+            from { 
+                transform: translateY(0) scale(1); 
+                opacity: 1; 
+            }
+            to { 
+                transform: translateY(-50px) scale(0.95); 
+                opacity: 0; 
+            }
+        }
+
+        /* Modal button hover effects */
+        .modal-close:hover {
+            background: var(--soft-border) !important;
+            color: var(--dark-gray) !important;
+        }
+
+        .modal-cancel:hover {
+            background: var(--soft-border) !important;
+            border-color: var(--medium-gray) !important;
+        }
+
+        .modal-confirm:hover {
+            background: var(--dark-red) !important;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: var(--spacing-8);
+            color: var(--medium-gray);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: var(--spacing-4);
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            margin-bottom: var(--spacing-2);
+            color: var(--dark-gray);
+        }
+
+        .empty-state p {
+            margin-bottom: var(--spacing-4);
+        }
+
+        /* Error States */
+        .error-state {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: var(--spacing-4);
+            border-radius: var(--radius);
+            margin: var(--spacing-4) 0;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-2);
+        }
+
+        .error-state i {
+            font-size: 1.2rem;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .controls-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                min-width: auto;
+            }
+
+            .controls-actions {
+                flex-direction: column;
+            }
+
+            .clients-table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .clients-table th,
+            .clients-table td {
+                min-width: 120px;
+                white-space: nowrap;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+        }
+    </style>
+    <script src="shared-scripts.js"></script>
+</head>
+<body>
+    <!-- Enhanced Navigation -->
+    <nav class="top-nav">
+        <div class="nav-container">
+            <div class="brand" onclick="window.location.href='/business-portal.html'">
+                <i class="fas fa-shield-alt"></i>
+                <div class="brand-text">
+                    <div class="brand-title">My Portal</div>
+                    <div class="brand-subtitle">by 2Knock Media group</div>
+                </div>
+            </div>
+            <div class="nav-links">
+                <a href="/business-portal.html" class="nav-link">
+                    <i class="fas fa-home"></i> Home
+                </a>
+                <a href="/dashboard-clientes.html" class="nav-link active">
+                    <i class="fas fa-users"></i> Clients
+                </a>
+                <a href="/customer-onboarding.html" class="nav-link">
+                    <i class="fas fa-user-plus"></i> Add Client
+                </a>
+                <a href="/fire_escapes_rp.html" class="nav-link">
+                    <i class="fas fa-file-alt"></i> Reports
+                </a>
+            </div>
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-content">
+                <h1 class="hero-title">Client Management Dashboard</h1>
+                <p class="hero-subtitle">Manage all your clients for Irias Iron Works and Boston Fire Escapes, track their status, and monitor your business growth</p>
+                <div class="hero-actions">
+                    <a href="/customer-onboarding.html" class="hero-btn">
+                        <i class="fas fa-plus"></i>
+                        Add New Client
+                    </a>
+                    <a href="/fire_escapes_rp.html" class="hero-btn secondary">
+                        <i class="fas fa-file-alt"></i>
+                        Create Report
+                    </a>
+                </div>
+            </div>
+        </section>
+
+
+
+        <!-- Controls Section -->
+        <div class="controls-section">
+            <div class="controls-header">
+                <h2 class="controls-title">Client Controls</h2>
+                <div class="controls-actions">
+                    <div class="search-box">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="search-input" id="searchInput" placeholder="Search clients...">
+                    </div>
+                    <select class="filter-select" id="companyFilter">
+                        <option value="all">All Companies</option>
+                        <option value="boston">Boston Fire Escapes</option>
+                        <option value="irias">Irias Iron Works</option>
+                    </select>
+                    <select class="filter-select" id="statusFilter">
+                        <option value="all">All Status</option>
+                        <option value="Active">Active</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Inactive">Inactive</option>
+                    </select>
+                    <a href="/customer-onboarding.html" class="add-client-btn">
+                        <i class="fas fa-plus"></i>
+                        Add Client
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Clients Section -->
+        <div class="clients-section">
+            <div class="clients-header">
+                <h2 class="clients-title">Client List</h2>
+                <p class="clients-subtitle">Manage and track all your clients from Google Sheets</p>
+                <div style="display: flex; align-items: center; gap: 1rem; margin-top: 0.5rem;">
+                    <div id="syncStatus" style="display: none;">
+                        <small style="color: var(--primary-red);">
+                            <i class="fas fa-sync-alt fa-spin"></i>
+                            Syncing with Google Sheets...
+                        </small>
+                    </div>
+                    <button id="refreshBtn" onclick="refreshDataWithFeedback()" style="
+                        background: var(--primary-red);
+                        color: white;
+                        border: none;
+                        padding: 0.75rem 1.5rem;
+                        border-radius: var(--radius-lg);
+                        cursor: pointer;
+                        font-size: var(--font-size-sm);
+                        font-weight: 600;
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        transition: all 0.3s ease;
+                        box-shadow: var(--shadow-sm);
+                    ">
+                        <i class="fas fa-sync-alt" id="refreshIcon"></i>
+                        <span id="refreshText">Refresh Data</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div id="clientsTableContainer">
+                <table class="clients-table" id="clientsTable">
+                    <thead>
+                        <tr>
+                            <th>Client Information</th>
+                            <th>Contact Details</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="clientsTableBody">
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 3rem;">
+                                <div class="loading-spinner" style="margin: 0 auto;"></div>
+                                <p style="margin-top: 1rem; color: var(--medium-gray); font-size: var(--font-size-sm);">
+                                    🔄 Loading clients from Google Sheets...
+                                </p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <!-- Pagination Container -->
+                <div id="paginationContainer" class="pagination-container"></div>
+            </div>
+        </div>
+
+        <!-- Data Source Selection Section -->
+        <div class="card" style="margin-bottom: 2rem;">
+            <div class="card-header">
+                <h3><i class="fas fa-database"></i> Data Source Configuration</h3>
+                <p class="text-muted mb-0">Change your Google Sheet source to load different client data</p>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="sheetUrl"><i class="fas fa-link"></i> Google Sheet URL</label>
+                            <input type="url" id="sheetUrl" class="form-control" 
+                                   placeholder="https://docs.google.com/spreadsheets/d/..." 
+                                   value="https://docs.google.com/spreadsheets/d/13Fld-uJgwWuJVVxyEJoB9h7zAVbN2HlizV5udmT5XZU/edit">
+                            <small class="form-text text-muted">Paste the full URL of your Google Sheet</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="sheetSelector"><i class="fas fa-table"></i> Select Sheet Tab</label>
+                            <select id="sheetSelector" class="form-control">
+                                <option value="">Loading sheets...</option>
+                            </select>
+                            <small class="form-text text-muted">Choose the specific sheet tab</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <button onclick="loadSheetData()" class="btn btn-primary btn-block">
+                                <i class="fas fa-sync-alt"></i> Load Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Current Source:</strong> 
+                            <span id="currentSource">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Important:</strong> Make sure your Google Sheet follows the correct template structure with these 27 columns:
+                            <br><small>FormEmailer Status, Client ID, Invoice Status, Estimate Status, Customer Status, Responsable, Timestamp, Date, Channel, Service Type, Client Full Name, E-mail, Address, Correo, Customer Phone Number, Customer Type, Technical Description, Price, Company Name, Project Address, Service Requested, Urgency Level, Preferred Contact Method, Additional Notes, Budget Range, Expected Timeline, Special Requirements</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="dashboard-modules.js"></script>
+    <script>
+        // All dashboard functionality is now handled by dashboard-modules.js
+        // The optimized ClientManager, ClientDataMapper, and ClientAPIManager classes
+        // are loaded from the external module for better maintainability and performance.
+        
+        // The dashboard is automatically initialized when the DOM is loaded
+        // All client management, filtering, pagination, and API operations
+        // are handled by the modular classes in dashboard-modules.js
+        
+        // Global function for manual refresh button
+        async function refreshDataWithFeedback() {
+            if (window.clientManager) {
+                await window.clientManager.manualRefresh();
+            } else {
+                console.error('ClientManager not available');
+            }
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,1461 @@
+y<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <title>🏢 My Portal - Client & Report Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="shared-styles.css">
+    <style>
+        /* Business Portal specific styles */
+        
+        /* Hero Section Enhanced */
+        .hero {
+            background: var(--gradient-primary);
+            color: var(--white);
+            padding: 6rem 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="90" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grain)"/></svg>');
+            pointer-events: none;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-8);
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: var(--spacing-6);
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            background: linear-gradient(45deg, #ffffff 30%, #f1f5f9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: var(--font-size-2xl);
+            margin-bottom: var(--spacing-12);
+            color: var(--white);
+            font-weight: 400;
+            line-height: 1.5;
+        }
+
+        .hero-cta {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-3);
+            background: var(--white);
+            color: var(--primary-red);
+            padding: var(--spacing-4) var(--spacing-8);
+            border-radius: var(--radius-xl);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: var(--font-size-lg);
+            box-shadow: var(--shadow-xl);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .hero-cta::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-primary);
+            transition: left 0.3s ease;
+            z-index: -1;
+        }
+
+        .hero-cta:hover::before {
+            left: 0;
+        }
+
+        .hero-cta:hover {
+            color: var(--white);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-2xl);
+        }
+
+        /* Enhanced Mobile Navigation */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--dark-gray);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: var(--spacing-2);
+            border-radius: var(--radius);
+            transition: all 0.3s ease;
+        }
+
+        .mobile-menu-btn:hover {
+            background: var(--very-light-gray);
+            color: var(--primary-red);
+        }
+
+        /* Touch-friendly improvements */
+        .nav-link,
+        .action-button,
+        .hero-cta {
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            text-align: center;
+        }
+
+        /* Ensure all buttons are centered */
+        .btn,
+        .action-button,
+        .hero-cta,
+        .nav-link {
+            justify-content: center;
+            text-align: center;
+        }
+
+        /* Center buttons within their containers */
+        .action-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .action-card .action-button {
+            align-self: center;
+            margin: 0 auto;
+        }
+
+        /* Improved focus states for mobile */
+        .nav-link:focus,
+        .action-button:focus,
+        .hero-cta:focus,
+        .mobile-menu-btn:focus {
+            outline: 2px solid var(--primary-red);
+            outline-offset: 2px;
+        }
+
+        /* Prevent text selection on interactive elements */
+        .action-card,
+        .stat-card {
+            user-select: none;
+        }
+
+        /* Smooth scrolling for mobile */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Prevent horizontal scroll on mobile */
+        body {
+            overflow-x: hidden;
+        }
+
+        /* Mobile-specific navigation styles */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--white);
+                border-top: 1px solid var(--border-color);
+                box-shadow: var(--shadow-lg);
+                flex-direction: column;
+                padding: var(--spacing-4);
+                z-index: 1000;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-link {
+                padding: var(--spacing-3) var(--spacing-4);
+                border-radius: var(--radius);
+                margin-bottom: var(--spacing-2);
+                font-size: var(--font-size-base);
+                font-weight: 500;
+                transition: all 0.3s ease;
+            }
+
+            .nav-link:hover {
+                background: var(--very-light-gray);
+                transform: none;
+            }
+
+            .mobile-menu-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .nav-container {
+                position: relative;
+            }
+        }
+
+        /* Enhanced Stats Grid */
+        .stats-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-8);
+            transform: translateY(-4rem);
+            position: relative;
+            z-index: 10;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-8);
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: var(--spacing-10) var(--spacing-8);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-xl);
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-2xl);
+        }
+
+        .stat-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--spacing-6);
+            color: var(--white);
+            font-size: 2rem;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover .stat-icon {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--black);
+            margin-bottom: var(--spacing-2);
+            line-height: 1;
+            transition: all 0.3s ease;
+        }
+
+        .stat-label {
+            font-size: var(--font-size-lg);
+            color: var(--medium-gray);
+            font-weight: 500;
+        }
+
+        /* Loading States */
+        .loading .stat-number {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Action Cards Enhanced */
+        .main-content {
+            max-width: 1280px;
+            margin: var(--spacing-16) auto;
+            padding: 0 var(--spacing-8);
+        }
+
+        .section-title {
+            font-size: var(--font-size-4xl);
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: var(--spacing-4);
+            color: var(--black);
+            letter-spacing: -0.02em;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: var(--medium-gray);
+            font-size: var(--font-size-xl);
+            margin-bottom: var(--spacing-16);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: var(--spacing-8);
+            margin-bottom: var(--spacing-16);
+        }
+
+        .action-card {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-10);
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .action-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: var(--gradient-primary);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .action-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .action-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-2xl);
+        }
+
+        .action-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-primary);
+            border-radius: var(--radius-xl);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: var(--spacing-6);
+            color: var(--white);
+            font-size: 2rem;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-md);
+            align-self: center;
+        }
+
+        .action-card:hover .action-icon {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .action-title {
+            font-size: var(--font-size-2xl);
+            font-weight: 700;
+            margin-bottom: var(--spacing-4);
+            color: var(--black);
+            text-align: center;
+            width: 100%;
+        }
+
+        .action-description {
+            color: var(--medium-gray);
+            margin-bottom: var(--spacing-8);
+            line-height: 1.6;
+            text-align: center;
+            width: 100%;
+        }
+
+        .action-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-2);
+            background: var(--gradient-primary);
+            color: var(--white);
+            padding: var(--spacing-3) var(--spacing-6);
+            border-radius: var(--radius-lg);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-md);
+            width: 100%;
+            text-align: center;
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Footer Enhanced */
+        .footer {
+            background: var(--dark-gray);
+            color: var(--white);
+            padding: var(--spacing-12) 0;
+            text-align: center;
+            margin-top: var(--spacing-20);
+        }
+
+        .footer-content {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-8);
+        }
+
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-3);
+            margin-bottom: var(--spacing-6);
+        }
+
+        .footer-brand i {
+            color: var(--primary-red);
+            font-size: 2rem;
+        }
+
+        .footer-brand-text {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .footer-brand-title {
+            font-weight: 800;
+            font-size: 1.8rem;
+            letter-spacing: -0.02em;
+            line-height: 1;
+        }
+
+        .footer-brand-subtitle {
+            font-size: var(--font-size-sm);
+            opacity: 0.8;
+            margin-top: -2px;
+        }
+
+        .footer-text {
+            opacity: 0.8;
+            margin-bottom: var(--spacing-8);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: var(--spacing-8);
+            margin-bottom: var(--spacing-8);
+            flex-wrap: wrap;
+        }
+
+        .footer-link {
+            color: var(--white);
+            text-decoration: none;
+            opacity: 0.8;
+            transition: all 0.3s ease;
+        }
+
+        .footer-link:hover {
+            opacity: 1;
+            color: var(--accent-red);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: var(--spacing-8);
+            opacity: 0.6;
+            font-size: var(--font-size-sm);
+        }
+
+        /* Mobile Enhancements */
+        @media (max-width: 768px) {
+            .hero {
+                padding: 3rem 0;
+            }
+
+            .hero-content {
+                padding: 0 var(--spacing-4);
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+                line-height: 1.2;
+                margin-bottom: var(--spacing-4);
+            }
+
+            .hero-subtitle {
+                font-size: var(--font-size-lg);
+                line-height: 1.6;
+                margin-bottom: var(--spacing-8);
+            }
+
+            .hero-cta {
+                padding: var(--spacing-3) var(--spacing-6);
+                font-size: var(--font-size-base);
+                min-height: 48px;
+                width: 100%;
+                max-width: 280px;
+                justify-content: center;
+            }
+
+            .stats-container {
+                transform: translateY(-2rem);
+                padding: 0 var(--spacing-4);
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-4);
+            }
+
+            .stat-card {
+                padding: var(--spacing-6) var(--spacing-4);
+                min-height: 120px;
+            }
+
+            .stat-icon {
+                font-size: 2rem;
+                margin-bottom: var(--spacing-3);
+            }
+
+            .stat-number {
+                font-size: var(--font-size-3xl);
+                margin-bottom: var(--spacing-2);
+            }
+
+            .stat-label {
+                font-size: var(--font-size-sm);
+            }
+
+            .main-content {
+                padding: 0 var(--spacing-4);
+                margin: var(--spacing-6) auto;
+            }
+
+            .section-title {
+                font-size: var(--font-size-2xl);
+                text-align: center;
+                margin-bottom: var(--spacing-4);
+            }
+
+            .section-subtitle {
+                text-align: center;
+                margin-bottom: var(--spacing-6);
+            }
+
+            .actions-grid {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-4);
+            }
+
+            .action-card {
+                padding: var(--spacing-6);
+                min-height: 200px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+
+            .action-icon {
+                font-size: 2.5rem;
+                margin-bottom: var(--spacing-4);
+            }
+
+            .action-title {
+                font-size: var(--font-size-xl);
+                margin-bottom: var(--spacing-3);
+            }
+
+            .action-description {
+                font-size: var(--font-size-base);
+                line-height: 1.6;
+                margin-bottom: var(--spacing-4);
+                flex-grow: 1;
+            }
+
+            .action-button {
+                padding: var(--spacing-3) var(--spacing-4);
+                font-size: var(--font-size-base);
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: var(--spacing-2);
+            }
+        }
+
+        /* Extra Small Mobile Devices */
+        @media (max-width: 480px) {
+            .hero {
+                padding: 2rem 0;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+                margin-bottom: var(--spacing-3);
+            }
+
+            .hero-subtitle {
+                font-size: var(--font-size-base);
+                margin-bottom: var(--spacing-6);
+            }
+
+            .hero-cta {
+                padding: var(--spacing-3) var(--spacing-5);
+                font-size: var(--font-size-sm);
+                min-height: 44px;
+            }
+
+            .stats-container {
+                transform: translateY(-1rem);
+                padding: 0 var(--spacing-3);
+            }
+
+            .stat-card {
+                padding: var(--spacing-5) var(--spacing-3);
+                min-height: 100px;
+            }
+
+            .stat-icon {
+                font-size: 1.75rem;
+                margin-bottom: var(--spacing-2);
+            }
+
+            .stat-number {
+                font-size: var(--font-size-2xl);
+                margin-bottom: var(--spacing-1);
+            }
+
+            .stat-label {
+                font-size: var(--font-size-xs);
+            }
+
+            .main-content {
+                padding: 0 var(--spacing-3);
+                margin: var(--spacing-4) auto;
+            }
+
+            .section-title {
+                font-size: var(--font-size-xl);
+                margin-bottom: var(--spacing-3);
+            }
+
+            .section-subtitle {
+                font-size: var(--font-size-sm);
+                margin-bottom: var(--spacing-4);
+            }
+
+            .action-card {
+                padding: var(--spacing-5);
+                min-height: 180px;
+            }
+
+            .action-icon {
+                font-size: 2rem;
+                margin-bottom: var(--spacing-3);
+            }
+
+            .action-title {
+                font-size: var(--font-size-lg);
+                margin-bottom: var(--spacing-2);
+            }
+
+            .action-description {
+                font-size: var(--font-size-sm);
+                margin-bottom: var(--spacing-3);
+            }
+
+            .action-button {
+                padding: var(--spacing-2) var(--spacing-3);
+                font-size: var(--font-size-sm);
+                min-height: 40px;
+            }
+        }
+
+        /* Landscape Mobile Optimization */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .hero {
+                padding: 2rem 0;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+                margin-bottom: var(--spacing-2);
+            }
+
+            .hero-subtitle {
+                font-size: var(--font-size-base);
+                margin-bottom: var(--spacing-4);
+            }
+
+            .stats-container {
+                transform: translateY(-1rem);
+            }
+
+            .stat-card {
+                padding: var(--spacing-4);
+                min-height: 80px;
+            }
+        }
+
+        /* Ultra Small Mobile Devices */
+        @media (max-width: 360px) {
+            .hero-title {
+                font-size: 1.75rem;
+            }
+
+            .hero-subtitle {
+                font-size: var(--font-size-sm);
+            }
+
+            .hero-cta {
+                padding: var(--spacing-2) var(--spacing-4);
+                font-size: var(--font-size-sm);
+                min-height: 40px;
+            }
+
+            .stat-card {
+                padding: var(--spacing-4) var(--spacing-2);
+                min-height: 90px;
+            }
+
+            .action-card {
+                padding: var(--spacing-4);
+                min-height: 160px;
+            }
+
+            .brand-title {
+                font-size: 1.25rem;
+            }
+
+            .brand-subtitle {
+                font-size: 0.75rem;
+            }
+        }
+
+        /* High DPI Mobile Devices */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .hero-cta,
+            .action-button,
+            .nav-link {
+                border-width: 0.5px;
+            }
+        }
+
+        /* Reduced Motion for Accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            .hero-cta,
+            .action-button,
+            .stat-card,
+            .action-card {
+                transition: none;
+            }
+
+            .hero-cta:hover,
+            .action-button:hover,
+            .stat-card:hover,
+            .action-card:hover {
+                transform: none;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .action-card,
+        .stat-card {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .action-card:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .action-card:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        .action-card:nth-child(4) {
+            animation-delay: 0.3s;
+        }
+    </style>
+    <script src="shared-scripts.js"></script>
+    <script src="portal-integration.js"></script>
+</head>
+<body>
+    <!-- Enhanced Navigation -->
+    <nav class="top-nav">
+        <div class="nav-container">
+            <div class="brand">
+                <i class="fas fa-shield-alt"></i>
+                <div class="brand-text">
+                    <div class="brand-title">My Portal</div>
+                    <div class="brand-subtitle">by 2Knock Media group</div>
+                </div>
+            </div>
+            <div class="nav-links" id="navLinks">
+                <a href="/dashboard-clientes.html" class="nav-link">
+                    <i class="fas fa-users"></i> Clients
+                </a>
+                <a href="/customer-onboarding.html" class="nav-link">
+                    <i class="fas fa-user-plus"></i> Add Client
+                </a>
+                <a href="/fire_escapes_rp.html" class="nav-link">
+                    <i class="fas fa-file-alt"></i> Reports
+                </a>
+            </div>
+            <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Enhanced Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Client & Report Management Portal</h1>
+            <p class="hero-subtitle">Streamline client management and inspection reports for Irias Iron Works Services and Boston Fire Escapes with our comprehensive business portal.</p>
+            <a href="/dashboard-clientes.html" class="hero-cta">
+                <i class="fas fa-rocket"></i>
+                Get Started
+            </a>
+        </div>
+    </section>
+
+    <!-- Enhanced Statistics -->
+    <div class="stats-container">
+        <div class="stats-grid">
+            <div class="stat-card" id="totalClientsCard">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-number" id="totalClients">
+                    <span class="loading-spinner"></span>
+                </div>
+                <div class="stat-label">Total Clients</div>
+            </div>
+            <div class="stat-card" id="totalReportsCard">
+                <div class="stat-icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="stat-number" id="totalReports">
+                    <span class="loading-spinner"></span>
+                </div>
+                <div class="stat-label">Reports Generated</div>
+            </div>
+            <div class="stat-card" id="thisMonthCard">
+                <div class="stat-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="stat-number" id="thisMonth">
+                    <span class="loading-spinner"></span>
+                </div>
+                <div class="stat-label">This Month</div>
+            </div>
+            <div class="stat-card" id="complianceCard">
+                <div class="stat-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Compliance Rate</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Main Content -->
+    <main class="main-content">
+        <h2 class="section-title">Business Management Tools</h2>
+        <p class="section-subtitle">Access all your client management and reporting tools for Irias Iron Works and Boston Fire Escapes from one centralized location</p>
+        
+        <div class="actions-grid">
+            <div class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3 class="action-title">Client Management</h3>
+                <p class="action-description">View, manage, and track all your clients for both Irias Iron Works and Boston Fire Escapes in one comprehensive dashboard.</p>
+                <a href="/dashboard-clientes.html" class="action-button">
+                    <i class="fas fa-arrow-right"></i>
+                    Manage Clients
+                </a>
+            </div>
+
+            <div class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <h3 class="action-title">Client Onboarding</h3>
+                <p class="action-description">Streamlined client registration process for both Irias Iron Works and Boston Fire Escapes with professional intake forms.</p>
+                <a href="/customer-onboarding.html" class="action-button">
+                    <i class="fas fa-arrow-right"></i>
+                    Add New Client
+                </a>
+            </div>
+
+            <div class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <h3 class="action-title">Inspection Reports</h3>
+                <p class="action-description">Generate professional inspection reports for fire escapes and iron works projects with detailed assessments and photo documentation.</p>
+                <a href="/fire_escapes_rp.html" class="action-button">
+                    <i class="fas fa-arrow-right"></i>
+                    Create Report
+                </a>
+            </div>
+
+            <div class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3 class="action-title">Analytics & Insights</h3>
+                <p class="action-description">Track performance metrics, client growth, and business insights for both Irias Iron Works and Boston Fire Escapes.</p>
+                <a href="#" class="action-button" onclick="showComingSoon()">
+                    <i class="fas fa-arrow-right"></i>
+                    View Analytics
+                </a>
+            </div>
+
+            <div class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-cogs"></i>
+                </div>
+                <h3 class="action-title">System Configuration</h3>
+                <p class="action-description">Configure email notifications, Zoho Flow integration, Google Sheets settings, and system preferences.</p>
+                <a href="/system-config.html" class="action-button">
+                    <i class="fas fa-arrow-right"></i>
+                    Configure System
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Enhanced Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <i class="fas fa-shield-alt"></i>
+                <div class="footer-brand-text">
+                    <div class="footer-brand-title">My Portal</div>
+                    <div class="footer-brand-subtitle">by 2Knock Media group</div>
+                </div>
+            </div>
+            <p class="footer-text">Professional fire safety management platform designed for modern businesses.</p>
+            <div class="footer-links">
+                <a href="/dashboard-clientes.html" class="footer-link">Clients</a>
+                <a href="/customer-onboarding.html" class="footer-link">Onboarding</a>
+                <a href="/fire_escapes_rp.html" class="footer-link">Reports</a>
+                <a href="#" class="footer-link">Support</a>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 My Portal by 2Knock Media group. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Using APIClient from shared-scripts.js
+
+        // Business Portal Statistics Manager using shared components
+        class BusinessStatsManager {
+            constructor() {
+                this.stats = {
+                    totalClients: 0,
+                    totalReports: 0,
+                    thisMonth: 0
+                };
+                // Don't call init() in constructor - wait for DOM to be ready
+            }
+
+            async init() {
+                await this.loadClientStats();
+                this.setupEventListeners();
+            }
+
+            async loadClientStats() {
+                try {
+                    console.log('🔄 BusinessStatsManager - Starting to load client stats...');
+                    this.showLoadingState();
+                    
+                    // Use fetch directly instead of apiClient
+                    const response = await fetch('/api/statistics');
+                    const statsResponse = await response.json();
+                    
+                    console.log('📊 BusinessStatsManager - Stats response:', statsResponse);
+                    
+                    if (statsResponse.success && statsResponse.data) {
+                        console.log('📊 BusinessStatsManager - Setting stats to:', statsResponse.data);
+                        this.stats = statsResponse.data;
+                        console.log('📊 BusinessStatsManager - Current stats object:', this.stats);
+                        this.updateStatsDisplay();
+                        console.log('✅ BusinessStatsManager - Stats updated successfully');
+                    } else {
+                        console.error('❌ BusinessStatsManager - Invalid response format:', statsResponse);
+                        throw new Error('Invalid response format');
+                    }
+                } catch (error) {
+                    console.error('❌ BusinessStatsManager - Error loading statistics:', error);
+                    if (window.notificationManager) {
+                        window.notificationManager.show(`Unable to load statistics: ${error.message}`, 'error');
+                    }
+                    this.showDemoStats();
+                } finally {
+                    this.hideLoadingState();
+                }
+            }
+
+            showLoadingState() {
+                const cards = ['totalClientsCard', 'totalReportsCard', 'thisMonthCard'];
+                cards.forEach(id => {
+                    window.loadingManager.show(id, 'Loading...');
+                });
+            }
+
+            hideLoadingState() {
+                const cards = ['totalClientsCard', 'totalReportsCard', 'thisMonthCard'];
+                cards.forEach(id => {
+                    window.loadingManager.hide(id);
+                });
+            }
+
+            showDemoStats() {
+                this.stats = {
+                    totalClients: 45,
+                    totalReports: 67,
+                    thisMonth: 8
+                };
+                this.updateStatsDisplay();
+            }
+
+            updateStatsDisplay() {
+                console.log('📊 BusinessStatsManager - Updating stats display with:', this.stats);
+                console.log('📊 BusinessStatsManager - Stats type:', typeof this.stats);
+                console.log('📊 BusinessStatsManager - Stats keys:', Object.keys(this.stats || {}));
+                
+                // Map the statistics to the correct elements
+                const elements = {
+                    totalClients: this.stats.totalClients || 0,
+                    totalReports: this.stats.completedInvoices || 0, // Use completed invoices as reports
+                    thisMonth: this.stats.pendingClients || 0 // Use pending clients as this month
+                };
+
+                console.log('📊 BusinessStatsManager - Mapped elements:', elements);
+
+                Object.entries(elements).forEach(([id, value]) => {
+                    console.log(`🔍 BusinessStatsManager - Looking for element with id: ${id}`);
+                    const element = document.getElementById(id);
+                    if (element) {
+                        console.log(`✅ BusinessStatsManager - Found element for ${id}:`, element);
+                        // Remove loading spinner if present
+                        const spinner = element.querySelector('.loading-spinner');
+                        if (spinner) {
+                            console.log(`🔄 BusinessStatsManager - Removing spinner from ${id}`);
+                            spinner.remove();
+                        }
+                        
+                        console.log(`📝 BusinessStatsManager - Setting ${id} text to: ${value}`);
+                        element.textContent = value.toLocaleString();
+                        console.log(`✅ BusinessStatsManager - Updated ${id}: ${value}`);
+                    } else {
+                        console.warn(`⚠️ BusinessStatsManager - Element with id '${id}' not found`);
+                        console.warn(`⚠️ BusinessStatsManager - Available elements:`, document.querySelectorAll('[id]'));
+                    }
+                });
+            }
+
+            setupEventListeners() {
+                // Add click handlers for stat cards
+                const statCards = document.querySelectorAll('.stat-card');
+                statCards.forEach(card => {
+                    card.addEventListener('click', () => {
+                        this.handleStatCardClick(card);
+                    });
+                });
+            }
+
+            handleStatCardClick(card) {
+                // Add visual feedback
+                card.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    card.style.transform = '';
+                }, 150);
+
+                // Show detailed information
+                const statType = card.querySelector('.stat-label').textContent;
+                this.showStatDetails(statType);
+            }
+
+            showStatDetails(statType) {
+                const details = {
+                    'Total Clients': 'Complete client database with contact information and service history',
+                    'Total Reports': 'All inspection reports generated and stored in the system',
+                    'This Month': 'New clients and reports from the current month'
+                };
+
+                const message = details[statType] || 'No additional information available';
+                window.notificationManager.show(message, 'info', 5000);
+            }
+
+            animateStats() {
+                const statNumbers = document.querySelectorAll('.stat-number');
+                statNumbers.forEach((stat, index) => {
+                    const target = parseInt(stat.textContent) || 0;
+                    let current = 0;
+                    const increment = Math.ceil(target / 50);
+                    
+                    setTimeout(() => {
+                        const timer = setInterval(() => {
+                            current += increment;
+                            if (current >= target) {
+                                current = target;
+                                clearInterval(timer);
+                            }
+                            stat.textContent = current.toLocaleString();
+                        }, 40);
+                    }, index * 200);
+                });
+            }
+        }
+
+        // Enhanced scroll effects
+        class ScrollManager {
+            constructor() {
+                this.nav = document.querySelector('.top-nav');
+                this.init();
+            }
+
+            init() {
+                window.addEventListener('scroll', window.utils.throttle(() => {
+                    this.handleScroll();
+                }, 16));
+            }
+
+            handleScroll() {
+                if (window.scrollY > 100) {
+                    this.nav.style.background = 'rgba(255, 255, 255, 0.98)';
+                    this.nav.style.boxShadow = 'var(--shadow-xl)';
+                } else {
+                    this.nav.style.background = 'rgba(255, 255, 255, 0.95)';
+                    this.nav.style.boxShadow = 'var(--shadow-lg)';
+                }
+            }
+        }
+
+        // Initialize everything when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Initializing Business Portal...');
+            
+            const scrollManager = new ScrollManager();
+
+            // Initialize portal integration for auto-updates
+            initializeBusinessPortalIntegration();
+            
+            // Load business clients immediately (no delay needed)
+            loadBusinessClients();
+
+            // Load statistics immediately
+            loadStatistics();
+
+            // Animate stats after a delay
+            setTimeout(() => {
+                animateStats();
+            }, 1000);
+        });
+
+        // Simple function to load statistics
+        async function loadStatistics() {
+            try {
+                console.log('🔄 Loading statistics...');
+                
+                const response = await fetch('/api/statistics');
+                const statsResponse = await response.json();
+                
+                console.log('📊 Statistics response:', statsResponse);
+                
+                if (statsResponse.success && statsResponse.data) {
+                    updateStatisticsDisplay(statsResponse.data);
+                    console.log('✅ Statistics loaded successfully');
+                } else {
+                    console.error('❌ Failed to load statistics:', statsResponse.message);
+                }
+            } catch (error) {
+                console.error('❌ Error loading statistics:', error);
+            }
+        }
+
+        // Simple function to update statistics display
+        function updateStatisticsDisplay(stats) {
+            console.log('📊 Updating statistics display with:', stats);
+            
+            const elements = {
+                totalClients: stats.totalClients || 0,
+                totalReports: stats.completedInvoices || 0,
+                thisMonth: stats.pendingClients || 0
+            };
+
+            Object.entries(elements).forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    // Remove loading spinner if present
+                    const spinner = element.querySelector('.loading-spinner');
+                    if (spinner) {
+                        spinner.remove();
+                    }
+                    
+                    element.textContent = value.toLocaleString();
+                    console.log(`✅ Updated ${id}: ${value}`);
+                } else {
+                    console.warn(`⚠️ Element with id '${id}' not found`);
+                }
+            });
+        }
+
+        // Simple function to animate stats
+        function animateStats() {
+            const statNumbers = document.querySelectorAll('.stat-number');
+            statNumbers.forEach((stat, index) => {
+                const target = parseInt(stat.textContent) || 0;
+                let current = 0;
+                const increment = Math.ceil(target / 50);
+                
+                setTimeout(() => {
+                    const timer = setInterval(() => {
+                        current += increment;
+                        if (current >= target) {
+                            current = target;
+                            clearInterval(timer);
+                        }
+                        stat.textContent = current.toLocaleString();
+                    }, 40);
+                }, index * 200);
+            });
+        }
+
+        // Portal Integration for Business Portal
+        async function initializeBusinessPortalIntegration() {
+            try {
+                console.log('🔄 Initializing Business Portal Integration...');
+                
+                // Set up auto-refresh every 60 seconds (less frequent for better performance)
+                setInterval(async () => {
+                    console.log('🔄 Auto-refreshing stats...');
+                    await refreshBusinessStats();
+                }, 60000); // Increased from 30 seconds to 60 seconds
+
+                // Refresh on page visibility change
+                document.addEventListener('visibilitychange', async () => {
+                    if (!document.hidden) {
+                        console.log('🔄 Page became visible, refreshing stats...');
+                        await refreshBusinessStats();
+                    }
+                });
+
+                console.log('✅ Business Portal Integration initialized');
+            } catch (error) {
+                console.error('❌ Business portal integration failed:', error);
+            }
+        }
+
+        async function refreshBusinessStats() {
+            try {
+                console.log('🔄 Refreshing business stats...');
+                
+                // Use fetch directly instead of apiClient
+                const response = await fetch('/api/statistics');
+                const statsResponse = await response.json();
+                
+                console.log('📊 Stats response:', statsResponse);
+                
+                if (statsResponse.success) {
+                    updateBusinessPortalStats(statsResponse.data);
+                    console.log('✅ Business stats updated successfully');
+                } else {
+                    console.error('❌ Failed to load stats:', statsResponse.message);
+                }
+            } catch (error) {
+                console.error('❌ Business stats refresh failed:', error);
+            }
+        }
+
+        async function loadBusinessClients() {
+            try {
+                console.log('🔄 Loading business clients...');
+                
+                const response = await fetch('/api/business-clients');
+                const clientsResponse = await response.json();
+                
+                console.log('📊 Business clients response:', clientsResponse);
+                
+                if (clientsResponse.success) {
+                    updateBusinessClientsList(clientsResponse.data.clients);
+                    console.log('✅ Business clients loaded successfully');
+                } else {
+                    console.error('❌ Failed to load business clients:', clientsResponse.message);
+                }
+            } catch (error) {
+                console.error('❌ Business clients load failed:', error);
+            }
+        }
+
+        function updateBusinessClientsList(clients) {
+            console.log('📊 Updating business clients list with:', clients);
+            
+            // Update clients list if it exists
+            const clientsContainer = document.getElementById('clientsList');
+            if (clientsContainer) {
+                let clientsHtml = '';
+                clients.slice(0, 10).forEach(client => {
+                    clientsHtml += `
+                        <div class="client-item">
+                            <div class="client-name">${client.name || 'N/A'}</div>
+                            <div class="client-email">${client.email || 'N/A'}</div>
+                            <div class="client-status">${client.customerStatus || 'N/A'}</div>
+                        </div>
+                    `;
+                });
+                clientsContainer.innerHTML = clientsHtml;
+                console.log('✅ Business clients list updated');
+            }
+        }
+
+        function updateBusinessPortalStats(stats) {
+            console.log('📊 Updating business portal stats with:', stats);
+            
+            // Map the statistics to the correct elements (same as BusinessStatsManager)
+            const elements = {
+                'totalClients': stats.totalClients || 0,
+                'totalReports': stats.completedInvoices || 0, // Use completed invoices as reports
+                'thisMonth': stats.pendingClients || 0 // Use pending clients as this month
+            };
+
+            Object.entries(elements).forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    // Remove loading spinner if present
+                    const spinner = element.querySelector('.loading-spinner');
+                    if (spinner) {
+                        spinner.remove();
+                    }
+                    
+                    element.textContent = value.toLocaleString();
+                    console.log(`✅ Updated ${id}: ${value}`);
+                } else {
+                    console.warn(`⚠️ Element with id '${id}' not found`);
+                }
+            });
+        }
+
+        function showComingSoon() {
+            window.notificationManager.show('Analytics dashboard is under development - Coming Soon!', 'info', 4000);
+        }
+
+        // Mobile Menu Management
+        function toggleMobileMenu() {
+            const navLinks = document.getElementById('navLinks');
+            const menuBtn = document.getElementById('mobileMenuBtn');
+            
+            navLinks.classList.toggle('active');
+            
+            // Change icon
+            const icon = menuBtn.querySelector('i');
+            if (navLinks.classList.contains('active')) {
+                icon.className = 'fas fa-times';
+            } else {
+                icon.className = 'fas fa-bars';
+            }
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const navLinks = document.getElementById('navLinks');
+            const menuBtn = document.getElementById('mobileMenuBtn');
+            
+            if (!navLinks.contains(event.target) && !menuBtn.contains(event.target)) {
+                navLinks.classList.remove('active');
+                const icon = menuBtn.querySelector('i');
+                icon.className = 'fas fa-bars';
+            }
+        });
+
+        // Close mobile menu when clicking on a link
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function() {
+                const navLinks = document.getElementById('navLinks');
+                const menuBtn = document.getElementById('mobileMenuBtn');
+                
+                navLinks.classList.remove('active');
+                const icon = menuBtn.querySelector('i');
+                icon.className = 'fas fa-bars';
+            });
+        });
+
+    </script>
+</body>
+</html> 

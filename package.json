@@ -1,0 +1,45 @@
+{
+  "name": "fire-escape-report-system",
+  "version": "1.0.0",
+  "description": "Professional Fire Escape and Iron Works Inspection Report System",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "security:audit": "npm audit --audit-level=moderate",
+    "security:fix": "npm audit fix",
+    "security:update": "npm update && npm audit fix"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^4.21.2",
+    "express-rate-limit": "^8.0.1",
+    "express-validator": "^7.2.1",
+    "formidable": "^3.5.4",
+    "google-auth-library": "^10.2.0",
+    "googleapis": "^126.0.1",
+    "helmet": "^8.1.0",
+    "html2canvas": "^1.4.1",
+    "js-yaml": "^4.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "jspdf": "^3.0.1",
+    "mysql2": "^3.14.3",
+    "node-fetch": "^3.3.2",
+    "nodemailer": "^7.0.5",
+    "uuid": "^9.0.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "keywords": [
+    "fire-escape",
+    "inspection",
+    "report",
+    "pdf",
+    "node.js"
+  ],
+  "author": "Fire Escape Services",
+  "license": "MIT"
+}

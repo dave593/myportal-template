@@ -1,0 +1,110 @@
+# Dependencies
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.example
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+*.md
+!README.md
+docs/
+*.txt
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+.nyc_output
+
+# Temporary folders
+tmp/
+temp/
+.tmp/
+
+# Build outputs
+dist/
+build/
+out/
+
+# Test files
+test/
+tests/
+__tests__/
+*.test.js
+*.spec.js
+
+# SSL certificates
+ssl/
+*.pem
+*.key
+*.crt
+*.csr
+
+# Configuration files that shouldn't be in production
+*_CONFIG.env
+*_EXAMPLE.env
+*_SETUP.md
+configure-*.js
+test-*.js
+find-*.js
+get-*.js
+create-*.js
+
+# Development scripts
+scripts/
+deploy-*.sh
+update-*.sh
+
+# Uploads and user data (will be created at runtime)
+uploads/
+Boston Fire Escapes Report/
+
+# Backup files
+backup-*.yaml
+*.backup 
+
+# Excluir todos los archivos JSON excepto los necesarios para npm
+*.json
+!package.json
+!package-lock.json 

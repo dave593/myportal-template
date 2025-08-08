@@ -1,0 +1,41 @@
+{
+  "business": {
+    "name": "NOMBRE_DEL_NEGOCIO",
+    "domain": "dominio.com",
+    "email": {
+      "from": "info@dominio.com",
+      "fromName": "NOMBRE DEL NEGOCIO",
+      "notifications": "notifications@dominio.com"
+    },
+    "logo": "logo.png",
+    "primaryColor": "#059669",
+    "secondaryColor": "#047857"
+  },
+  "google": {
+    "projectId": "tu-proyecto-id",
+    "sheetsId": "tu-google-sheets-id",
+    "driveFolderId": "tu-google-drive-folder-id"
+  },
+  "database": {
+    "host": "tu-db-host",
+    "name": "tu-db-name",
+    "user": "tu-db-user"
+  },
+  "services": {
+    "email": {
+      "service": "gmail",
+      "user": "tu-email@gmail.com"
+    },
+    "zoho": {
+      "webhookUrl": "tu-zoho-webhook-url"
+    }
+  },
+  "features": {
+    "customerOnboarding": true,
+    "reports": true,
+    "googleSheets": true,
+    "googleDrive": true,
+    "emailNotifications": true,
+    "zohoIntegration": true
+  }
+} 
