@@ -286,4 +286,26 @@ For technical support or questions about the system:
 
 ---
 
-**Built with ❤️ for professional business management** 
+**Built with ❤️ for professional business management**
+
+---
+
+## 🎯 **TEMPLATE PRINCIPAL**
+
+**Esta es la base para todos los portales - sacar copia NO DANAR ESTE**
+
+### 📋 **Instrucciones de Uso**
+1. **Clonar este repositorio** como base para nuevos clientes
+2. **Configurar credenciales específicas** por cliente
+3. **Personalizar según necesidades** del negocio
+4. **Mantener este template intacto** para futuras referencias
+
+### 🔧 **Configuración Rápida**
+```bash
+# Clonar el template
+git clone https://github.com/dave593/myportal-template.git
+
+# Configurar nuevo cliente
+cd myportal-template
+./setup-new-client.sh "Nombre del Negocio" "dominio.com"
+```
