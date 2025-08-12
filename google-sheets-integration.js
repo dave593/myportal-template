@@ -24,7 +24,7 @@ class GoogleSheetsIntegration {
             console.log('🚀 Initializing Google Sheets integration...');
             
             // Use API Key for Google Sheets access - Hardcoded for testing
-            const apiKey = 'AIzaSyC1gc-0NZDoSG1x5LPc8t7e8jS7SBQCCcI';
+            const apiKey = process.env.GOOGLE_API_KEY || '';
             console.log('🔑 Using Google API Key for Sheets access');
             console.log('📋 API Key exists:', !!process.env.GOOGLE_API_KEY);
             console.log('📋 API Key length:', process.env.GOOGLE_API_KEY ? process.env.GOOGLE_API_KEY.length : 0);
