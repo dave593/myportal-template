@@ -3,6 +3,39 @@ class PortalIntegration {
     constructor(pageType) {
         this.pageType = pageType;
         
+        // Get authentication token from localStorage or sessionStorage
+        this.getAuthToken = function() {
+            // Try to get token from localStorage first (persistent)
+            let token = localStorage.getItem('fire_escape_jwt_token') || localStorage.getItem('authToken') || localStorage.getItem('jwtToken');
+            
+            // If not in localStorage, try sessionStorage (session-only)
+            if (!token) {
+                token = sessionStorage.getItem('fire_escape_jwt_token') || sessionStorage.getItem('authToken') || sessionStorage.getItem('jwtToken');
+            }
+            
+            // If still no token, try to get from URL parameters (for OAuth flow)
+            if (!token) {
+                const urlParams = new URLSearchParams(window.location.search);
+                token = urlParams.get('token') || urlParams.get('access_token');
+                
+                // If token found in URL, save it to localStorage and clean URL
+                if (token) {
+                    console.log('🔑 Token found in URL, saving to localStorage');
+                    localStorage.setItem('fire_escape_jwt_token', token);
+                    
+                    // Clean URL by removing token parameter
+                    const newUrl = new URL(window.location);
+                    newUrl.searchParams.delete('token');
+                    newUrl.searchParams.delete('access_token');
+                    newUrl.searchParams.delete('success');
+                    window.history.replaceState({}, document.title, newUrl.pathname);
+                }
+            }
+            
+            console.log('🔑 Auth token found:', !!token);
+            return token;
+        };
+        
         // Define status options
         this.statusOptions = [
             'New Lead',
@@ -79,7 +112,19 @@ class PortalIntegration {
 
     async loadDashboardData() {
         try {
-            const response = await fetch('/api/clients');
+            // Get authentication token
+            const token = this.getAuthToken();
+            if (!token) {
+                console.error('❌ No authentication token found');
+                throw new Error('Authentication required. Please login first.');
+            }
+            
+            const response = await fetch('/api/clients', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
             const clientsResponse = await response.json();
             
             if (clientsResponse.success) {
@@ -110,7 +155,19 @@ class PortalIntegration {
 
     async syncDashboardData() {
         try {
-            const response = await fetch('/api/clients');
+            // Get authentication token
+            const token = this.getAuthToken();
+            if (!token) {
+                console.error('❌ No authentication token found for sync');
+                return;
+            }
+            
+            const response = await fetch('/api/clients', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
             const clientsResponse = await response.json();
             
             if (clientsResponse.success) {

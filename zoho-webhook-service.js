@@ -9,6 +9,42 @@ class ZohoWebhookService {
     }
 
     /**
+     * Initialize Zoho service with environment variables
+     * @returns {Promise<Object>} - Initialization result
+     */
+    async initialize() {
+        try {
+            console.log('🔗 Initializing Zoho service...');
+            
+            const webhookUrl = process.env.ZOHO_WEBHOOK_URL;
+            const webhookSecret = process.env.ZOHO_WEBHOOK_SECRET;
+            
+            if (webhookUrl) {
+                this.configure({
+                    webhookUrl: webhookUrl,
+                    webhookSecret: webhookSecret || ''
+                });
+                return {
+                    success: true,
+                    message: 'Zoho service initialized successfully'
+                };
+            } else {
+                console.log('⚠️ Zoho webhook URL not found in environment variables');
+                return {
+                    success: false,
+                    message: 'Zoho webhook URL not configured'
+                };
+            }
+        } catch (error) {
+            console.error('❌ Error initializing Zoho service:', error);
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+
+    /**
      * Configure Zoho Flow webhook
      * @param {Object} config - Webhook configuration
      * @param {string} config.webhookUrl - Zoho Flow webhook URL

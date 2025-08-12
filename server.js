@@ -707,6 +707,16 @@ async function handleAPIRoute(req, res) {
                 }
                 break;
                 
+            case 'test':
+                console.log('🧪 Test endpoint called in server.js');
+                sendSuccessResponse(res, { 
+                    message: 'Test endpoint working',
+                    timestamp: new Date().toISOString(),
+                    server: 'server.js',
+                    googleSheetsInitialized: googleSheets.initialized
+                }, "Test endpoint working");
+                break;
+                
             case 'upload-pdf':
                 if (req.method === 'POST') {
                     console.log('📁 Serving /api/upload-pdf endpoint');
@@ -1626,26 +1636,72 @@ async function handleAPIRoute(req, res) {
             case 'reports':
                 if (req.method === 'GET') {
                     console.log('🔍 Serving /api/reports endpoint');
-                    // Mock data for reports - esto se reemplazará con datos reales de Google Sheets
-                    const mockReports = [
-                        {
-                            id: 'REP-001',
-                            clientName: 'Boston Fire Escape Services',
-                            date: '2024-07-15',
-                            status: 'completed',
-                            inspector: 'David Ramirez',
-                            type: 'Fire Escapes'
-                        },
-                        {
-                            id: 'REP-002',
-                            clientName: 'Irias Iron Works Services',
-                            date: '2024-07-20',
-                            status: 'pending',
-                            inspector: 'Dionel Irias',
-                            type: 'Exterior Railings'
+                    try {
+                        // Ensure Google Sheets is initialized
+                        if (!googleSheets.initialized) {
+                            await googleSheets.initialize();
                         }
-                    ];
-                    sendSuccessResponse(res, { reports: mockReports, total: mockReports.length }, 'Reports retrieved successfully');
+                        
+                        // Get reports from Google Sheets
+                        const reports = await googleSheets.getReportsData();
+                        console.log('📊 Raw reports from Google Sheets:', reports);
+                        
+                        // If no reports found, try alternative approach
+                        let finalReports = reports;
+                        if (!reports || reports.length === 0) {
+                            console.log('📊 No reports found, trying alternative approach...');
+                            try {
+                                const response = await googleSheets.sheets.spreadsheets.values.get({
+                                    spreadsheetId: googleSheets.spreadsheetId,
+                                    range: 'Form Responses 1!A:O',
+                                    key: googleSheets.apiKey
+                                });
+                                
+                                const rows = response.data.values;
+                                if (rows && rows.length > 1) {
+                                    finalReports = rows.slice(1).map(row => ({
+                                        reportId: row[0] || 'REP-' + Date.now(),
+                                        clientName: row[4] || 'Unknown',
+                                        clientEmail: row[5] || '',
+                                        reportType: row[6] || 'Fire Escape Inspection',
+                                        generatedAt: row[13] || new Date().toISOString(),
+                                        status: row[7] || 'Generated',
+                                        reportUrl: row[14] || '',
+                                        company: row[3] || '',
+                                        inspectionDate: row[2] || new Date().toISOString().split('T')[0],
+                                        inspector: row[11] || 'David Ramirez'
+                                    }));
+                                    console.log('📊 Found ' + finalReports.length + ' reports from alternative approach');
+                                }
+                            } catch (altError) {
+                                console.error('❌ Alternative approach failed:', altError.message);
+                            }
+                        }
+                        
+                        // Transform data to match expected format
+                        const transformedReports = finalReports.map(report => ({
+                            reportId: report.reportId,
+                            clientName: report.clientName,
+                            clientEmail: report.clientEmail || report.address || '',
+                            reportType: report.reportType,
+                            generatedAt: report.generatedAt || report.createdAt || report.date,
+                            status: report.status,
+                            reportUrl: report.reportUrl || '',
+                            company: report.company,
+                            inspectionDate: report.inspectionDate || report.date,
+                            inspector: report.inspector
+                        }));
+                        
+                        console.log(`📊 Final result: ${transformedReports.length} reports`);
+                        
+                        sendSuccessResponse(res, { 
+                            data: { reports: transformedReports },
+                            total: transformedReports.length 
+                        }, 'Reports retrieved successfully');
+                    } catch (error) {
+                        console.error('❌ Error getting reports from Google Sheets:', error);
+                        sendErrorResponse(res, 500, 'Error retrieving reports from Google Sheets', error);
+                    }
                 } else {
                     sendErrorResponse(res, 405, 'Method not allowed');
                 }

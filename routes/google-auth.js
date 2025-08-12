@@ -59,25 +59,13 @@ class GoogleAuthRoutes {
         try {
             let clientId, clientSecret;
             
-            // Intentar cargar desde GOOGLE_OAUTH_CLIENT_ID (nuevo formato)
-            if (process.env.GOOGLE_OAUTH_CLIENT_ID) {
-                try {
-                    const oauthConfig = JSON.parse(process.env.GOOGLE_OAUTH_CLIENT_ID);
-                    clientId = oauthConfig.web ? oauthConfig.web.client_id : oauthConfig.client_id;
-                    clientSecret = oauthConfig.web ? oauthConfig.web.client_secret : oauthConfig.client_secret;
-                    console.log('✅ OAuth credentials loaded from GOOGLE_OAUTH_CLIENT_ID');
-                } catch (parseError) {
-                    console.error('❌ Error parsing GOOGLE_OAUTH_CLIENT_ID:', parseError.message);
-                }
-            }
+            // Cargar credenciales desde variables de entorno
+            clientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
+            clientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
             
-            // Fallback a variables separadas (formato antiguo)
-            if (!clientId) {
-                clientId = process.env.GOOGLE_CLIENT_ID;
-            }
-            if (!clientSecret) {
-                clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-            }
+            console.log('🔍 Checking OAuth credentials...');
+            console.log('Client ID:', clientId ? 'SET' : 'NOT SET');
+            console.log('Client Secret:', clientSecret ? 'SET' : 'NOT SET');
             
             // Verificar si las credenciales están configuradas
             if (!clientId || clientId === 'your-google-client-id-here' || 
@@ -145,24 +133,9 @@ class GoogleAuthRoutes {
 
             let clientId, clientSecret;
             
-            // Intentar cargar desde GOOGLE_OAUTH_CLIENT_ID (nuevo formato)
-            if (process.env.GOOGLE_OAUTH_CLIENT_ID) {
-                try {
-                    const oauthConfig = JSON.parse(process.env.GOOGLE_OAUTH_CLIENT_ID);
-                    clientId = oauthConfig.web ? oauthConfig.web.client_id : oauthConfig.client_id;
-                    clientSecret = oauthConfig.web ? oauthConfig.web.client_secret : oauthConfig.client_secret;
-                } catch (parseError) {
-                    console.error('❌ Error parsing GOOGLE_OAUTH_CLIENT_ID:', parseError.message);
-                }
-            }
-            
-            // Fallback a variables separadas (formato antiguo)
-            if (!clientId) {
-                clientId = process.env.GOOGLE_CLIENT_ID;
-            }
-            if (!clientSecret) {
-                clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-            }
+            // Cargar credenciales desde variables de entorno
+            clientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
+            clientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
             
             const host = req.headers.host || 'fire-escape-reports-628784106563.us-central1.run.app';
             
@@ -239,9 +212,19 @@ class GoogleAuthRoutes {
 
             console.log('✅ Usuario autenticado exitosamente:', user.email);
 
-            // Redirigir al dashboard con JWT token en URL (temporal, luego se almacenará en localStorage)
+            // Establecer cookie con el token JWT para autenticación global
+            const cookieOptions = {
+                httpOnly: false, // Permitir acceso desde JavaScript
+                secure: true,    // Solo HTTPS
+                sameSite: 'lax', // Protección CSRF
+                maxAge: 24 * 60 * 60 * 1000, // 24 horas
+                path: '/'
+            };
+
+            // Redirigir al dashboard con JWT token en URL y cookie
             res.writeHead(302, { 
-                'Location': `/dashboard-clientes.html?success=authenticated&token=${encodeURIComponent(token)}`
+                'Location': `/dashboard-clientes.html?success=authenticated&token=${encodeURIComponent(token)}`,
+                'Set-Cookie': `fire_escape_jwt_token=${token}; HttpOnly=false; Secure; SameSite=Lax; Max-Age=86400; Path=/`
             });
             res.end();
         } catch (error) {

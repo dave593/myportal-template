@@ -386,6 +386,44 @@ A new customer lead has been registered in the system.
     }
 
     /**
+     * Initialize email service with environment variables
+     * @returns {Promise<Object>} - Initialization result
+     */
+    async initialize() {
+        try {
+            console.log('📧 Initializing email service...');
+            
+            const email = process.env.EMAIL_GMAIL_USER;
+            const password = process.env.EMAIL_GMAIL_APP_PASSWORD;
+            
+            if (email && password) {
+                await this.configure({
+                    email: email,
+                    password: password,
+                    service: 'gmail',
+                    emailFromName: 'IRIAS Ironworks'
+                });
+                return {
+                    success: true,
+                    message: 'Email service initialized successfully'
+                };
+            } else {
+                console.log('⚠️ Email credentials not found in environment variables');
+                return {
+                    success: false,
+                    message: 'Email credentials not configured'
+                };
+            }
+        } catch (error) {
+            console.error('❌ Error initializing email service:', error);
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+
+    /**
      * Verify email configuration
      * @returns {Promise<Object>} - Verification result
      */

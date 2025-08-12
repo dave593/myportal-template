@@ -305,6 +305,46 @@
     </div>
 
     <script>
+        // Función para mostrar mensajes
+        function showMessage(message, type = 'error') {
+            const errorDiv = document.getElementById('error-message');
+            const successDiv = document.getElementById('success-message');
+            const pendingDiv = document.getElementById('pending-approval-message');
+            const domainDiv = document.getElementById('domain-not-authorized-message');
+            
+            // Ocultar todos los mensajes primero
+            errorDiv.style.display = 'none';
+            successDiv.style.display = 'none';
+            pendingDiv.style.display = 'none';
+            domainDiv.style.display = 'none';
+            
+            // Mostrar el mensaje apropiado según el tipo
+            switch (type) {
+                case 'success':
+                    successDiv.textContent = message;
+                    successDiv.style.display = 'block';
+                    break;
+                case 'warning':
+                    errorDiv.textContent = message;
+                    errorDiv.style.display = 'block';
+                    break;
+                case 'info':
+                    if (message.includes('pendiente')) {
+                        pendingDiv.style.display = 'block';
+                    } else {
+                        errorDiv.textContent = message;
+                        errorDiv.style.display = 'block';
+                    }
+                    break;
+                case 'domain':
+                    domainDiv.style.display = 'block';
+                    break;
+                default:
+                    errorDiv.textContent = message;
+                    errorDiv.style.display = 'block';
+            }
+        }
+
         // Handle URL parameters for error messages
         const urlParams = new URLSearchParams(window.location.search);
         const error = urlParams.get('error');
@@ -329,6 +369,7 @@
                     break;
                 case 'unauthorized_domain':
                     errorMessage = '❌ Dominio de email no autorizado.';
+                    errorType = 'domain';
                     break;
                 case 'pending_approval':
                     errorMessage = '⏳ Tu cuenta está pendiente de aprobación.';

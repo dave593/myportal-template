@@ -15,57 +15,40 @@ class GoogleSheetsIntegration {
     }
 
     async initialize() {
+        if (this.initialized) {
+            console.log('✅ Google Sheets already initialized');
+            return;
+        }
+
         try {
-            console.log('🔐 Inicializando Google Sheets...');
+            console.log('🚀 Initializing Google Sheets integration...');
             
-            // Verificar si tenemos credenciales de Service Account
-            if (process.env.GOOGLE_SERVICE_ACCOUNT_KEY && process.env.GOOGLE_SERVICE_ACCOUNT_KEY.trim() !== '') {
-                console.log('🔑 Usando credenciales de Service Account');
-                
-                try {
-                    // Intentar parsear la clave de Service Account como JSON
-                    let serviceAccountKey;
-                    
-                    // Primero intentar como JSON directo
-                    try {
-                        serviceAccountKey = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY);
-                        console.log('✅ Service Account key parsed as JSON');
-                    } catch (jsonError) {
-                        // Si falla, intentar como base64
-                        try {
-                            serviceAccountKey = JSON.parse(Buffer.from(process.env.GOOGLE_SERVICE_ACCOUNT_KEY, 'base64').toString('utf-8'));
-                            console.log('✅ Service Account key parsed as base64');
-                        } catch (base64Error) {
-                            throw new Error('Invalid Service Account key format');
-                        }
-                    }
-                    
-                    // Configurar autenticación
-                    this.auth = new google.auth.GoogleAuth({
-                        credentials: serviceAccountKey,
-                        scopes: ['https://www.googleapis.com/auth/spreadsheets']
-                    });
-                    
-                    // Inicializar Google Sheets API
-                    this.sheets = google.sheets({ version: 'v4', auth: this.auth });
-                
-                console.log('✅ Google Sheets integration initialized con credenciales');
-                } catch (parseError) {
-                    console.log('⚠️ Error parsing Service Account key, falling back to public access');
-                    console.log('🔍 Parse error:', parseError.message);
-                    this.sheets = google.sheets({ version: 'v4' });
-                }
-            } else {
-                console.log('⚠️ No Service Account credentials found, using public access');
-                this.sheets = google.sheets({ version: 'v4' });
-            }
-                
+            // Use API Key for Google Sheets access - Hardcoded for testing
+            const apiKey = 'AIzaSyC1gc-0NZDoSG1x5LPc8t7e8jS7SBQCCcI';
+            console.log('🔑 Using Google API Key for Sheets access');
+            console.log('📋 API Key exists:', !!process.env.GOOGLE_API_KEY);
+            console.log('📋 API Key length:', process.env.GOOGLE_API_KEY ? process.env.GOOGLE_API_KEY.length : 0);
+            console.log('📋 Using API Key:', apiKey.substring(0, 10) + '...');
+            console.log('📋 All environment variables:', Object.keys(process.env).filter(key => key.includes('GOOGLE')).join(', '));
+            console.log('📋 Full API Key (first 20 chars):', apiKey.substring(0, 20));
+            this.sheets = google.sheets({ version: 'v4' });
+            this.apiKey = apiKey;
+            
+            // Test the connection
+            console.log('🧪 Testing Google Sheets connection...');
+            const testResponse = await this.sheets.spreadsheets.get({
+                spreadsheetId: this.spreadsheetId,
+                key: apiKey
+            });
+            
+            console.log('✅ Google Sheets connection successful');
+            console.log(`📊 Connected to: ${testResponse.data.properties.title}`);
+            
             this.initialized = true;
-                return true;
+            
         } catch (error) {
-            console.error('❌ Error initializing Google Sheets:', error);
-            this.initialized = false;
-            return false;
+            console.error('❌ Failed to initialize Google Sheets:', error.message);
+            throw error;
         }
     }
 
@@ -84,18 +67,13 @@ class GoogleSheetsIntegration {
         try {
             await this.ensureInitialized();
             
-            // Check cache first
-            const cacheKey = 'clients_data';
-            if (this.isCacheValid(cacheKey)) {
-                console.log('📊 Returning cached clients data');
-                return this.getCache(cacheKey);
-            }
+            // DISABLED CACHE - Always fetch fresh data to avoid data loss
+            console.log('📊 Cache disabled - fetching fresh data from Google Sheets');
             
             console.log('🔍 Fetching real clients data from Google Sheets...');
             const data = await this.getRealClientsData();
             
-            // Cache the result
-            this.setCache(cacheKey, data);
+            // CACHE DISABLED - Not storing data in cache to ensure fresh data
             
             return data;
         } catch (error) {
@@ -108,42 +86,39 @@ class GoogleSheetsIntegration {
         try {
             await this.ensureInitialized();
             
-            console.log('🔍 Starting getRealClientsData...');
-                console.log('📊 Spreadsheet ID:', this.spreadsheetId);
+            console.log('🔍 Starting getRealClientsData (using Sheets API directly)...');
+            console.log('📊 Spreadsheet ID:', this.spreadsheetId);
             console.log('📋 Range:', this.range);
-            console.log('🔑 Has Service Account Key:', !!(process.env.GOOGLE_SERVICE_ACCOUNT_KEY && process.env.GOOGLE_SERVICE_ACCOUNT_KEY.trim() !== ''));
             
-            // Por ahora, usar siempre acceso público ya que las credenciales no están configuradas correctamente
-                console.log('🔍 Fetching real clients data from public Google Sheets...');
-                console.log('📊 Spreadsheet ID:', this.spreadsheetId);
-                
-                // Usar la URL de exportación CSV para acceso público
-                const csvUrl = `https://docs.google.com/spreadsheets/d/${this.spreadsheetId}/gviz/tq?tqx=out:csv`;
-                
-                console.log('📥 Fetching CSV from:', csvUrl);
-                
-                // Usar fetch para obtener los datos CSV
-                const response = await fetch(csvUrl);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const csvText = await response.text();
-                console.log('📄 CSV data received, length:', csvText.length);
-                
-                // Parsear CSV
-                const rows = this.parseCSV(csvText);
-                if (!rows || rows.length === 0) {
-                    console.log('⚠️ No data found in Google Sheets');
-                    return [];
-                }
+            // Usar Google Sheets API directamente para obtener datos precisos
+            if (!process.env.GOOGLE_SERVICE_ACCOUNT_KEY) {
+                throw new Error('Service Account credentials not configured for direct Sheets API read');
+            }
+            
+            const { google } = require('googleapis');
+            const serviceAccountKey = JSON.parse(Buffer.from(process.env.GOOGLE_SERVICE_ACCOUNT_KEY, 'base64').toString());
+            const auth = new google.auth.GoogleAuth({
+                credentials: serviceAccountKey,
+                scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly']
+            });
+            const sheets = google.sheets({ version: 'v4', auth });
+            
+            console.log('📥 Fetching data from Sheets API directly...');
+            const response = await sheets.spreadsheets.values.get({
+                spreadsheetId: this.spreadsheetId,
+                range: this.range
+            });
+            
+            const rows = response.data.values;
+            if (!rows || rows.length === 0) {
+                console.log('⚠️ No data found in Google Sheets via direct API');
+                return [];
+            }
+            
+            console.log(`📊 Found ${rows.length} rows in Google Sheets via direct API`);
+            console.log('📋 Headers:', rows[0]);
 
-                console.log(`📊 Found ${rows.length} rows in Google Sheets`);
-                console.log('📋 Headers:', rows[0]);
-
-                // Procesar los datos del Google Sheet
-            // La primera fila contiene headers concatenados con datos de ejemplo
-            // Necesitamos extraer solo los headers reales
+            // Procesar los datos del Google Sheet usando API directa
             const firstRow = rows[0];
             const headers = firstRow.map(header => {
                 // Extraer solo la parte del header (antes del primer espacio)
@@ -153,16 +128,39 @@ class GoogleSheetsIntegration {
             
             console.log('📋 Cleaned headers:', headers);
             
-            // Usar todas las filas como datos, pero filtrar la primera fila que es un template
-            const dataRows = rows.slice(1); // Excluir la primera fila que es template
+            // Filtrar datos de ejemplo y template
+            const dataRows = rows.slice(1).filter(row => {
+                // Excluir filas con datos de ejemplo
+                const clientName = row[10] || ''; // Client Full Name
+                const clientId = row[1] || ''; // Client ID
+                
+                // Lista de patrones de ejemplo a excluir (más específicos)
+                const examplePatterns = [
+                    'john doe', 'jane doe', 'test client', 'example client',
+                    'cli001', 'cli002', 'test-client', 'test-cli', 'demo'
+                ];
+                
+                // Solo filtrar si el nombre contiene patrones de ejemplo
+                const isExample = examplePatterns.some(pattern => 
+                    clientName.toLowerCase().includes(pattern)
+                );
+                
+                // NO filtrar por ID porque los IDs reales contienen "CLI"
+                
+                if (isExample) {
+                    console.log(`🚫 Filtering out example data: ${clientName} (${clientId})`);
+                    return false;
+                }
+                
+                return true;
+            });
 
-            // Calcular el rowIndex real considerando las filas filtradas
-                const clients = dataRows
-                .map((row, originalIndex) => {
-                    // Calcular el rowIndex real de Google Sheets
-                    // Según los logs, Fernando Ramirez está en originalIndex: 152 y debe estar en línea 156
-                    // Esto significa que necesitamos originalIndex + 4
-                    let realRowIndex = originalIndex + 4;
+            // Calcular el rowIndex real usando la API directa
+            const clients = dataRows
+            .map((row, originalIndex) => {
+                // Con la API directa, el rowIndex es simplemente la posición en el array + 2
+                // (1 para el header + 1 para el offset de Google Sheets)
+                let realRowIndex = originalIndex + 2;
                     
                     // Función helper para obtener valores usando headers dinámicos
                     const getValue = (headerName) => {
@@ -292,6 +290,12 @@ class GoogleSheetsIntegration {
             }
                 
                 console.log(`✅ Successfully loaded ${clients.length} clients from Google Sheets`);
+            
+            // Log primeros 5 clientes para verificar que son datos reales
+            console.log('📋 First 5 clients loaded:');
+            clients.slice(0, 5).forEach((client, index) => {
+                console.log(`   ${index + 1}. ${client.name} - ID: ${client.clientId} - Status: ${client.customerStatus} - Row: ${client.rowIndex}`);
+            });
                 return clients;
         } catch (error) {
             console.error('❌ Error in getRealClientsData:', error);
@@ -479,18 +483,13 @@ class GoogleSheetsIntegration {
         try {
             console.log('📊 Getting Form Responses clients...');
             
-            // Verificar cache
-            const cacheKey = 'form_responses_clients';
-            if (this.isCacheValid(cacheKey)) {
-                console.log('📊 Returning cached Form Responses clients');
-                return this.getCache(cacheKey);
-            }
+            // DISABLED CACHE - Always fetch fresh data to avoid data loss
+            console.log('📊 Cache disabled - fetching fresh Form Responses data from Google Sheets');
 
             // Usar el mismo método que getRealClientsData para obtener datos
             const clients = await this.getRealClientsData();
 
-            // Guardar en cache
-            this.setCache(cacheKey, clients);
+            // CACHE DISABLED - Not storing data in cache to ensure fresh data
             console.log(`✅ Successfully loaded ${clients.length} Form Responses clients`);
             
             return clients;
@@ -563,16 +562,29 @@ class GoogleSheetsIntegration {
         }
     }
 
+    async addClient(clientData) {
+        return await this.addClientToSheet(clientData);
+    }
+
     async addClientToSheet(clientData) {
         try {
             console.log('📝 Adding client to Google Sheet...');
             
-            await this.ensureInitialized();
-            
-            // Verificar credenciales
+            // Verificar credenciales de Service Account
             if (!process.env.GOOGLE_SERVICE_ACCOUNT_KEY) {
                 throw new Error('Service Account credentials not configured');
             }
+
+            // Crear cliente de Google Sheets con Service Account
+            const { google } = require('googleapis');
+            const serviceAccountKey = JSON.parse(Buffer.from(process.env.GOOGLE_SERVICE_ACCOUNT_KEY, 'base64').toString());
+            
+            const auth = new google.auth.GoogleAuth({
+                credentials: serviceAccountKey,
+                scopes: ['https://www.googleapis.com/auth/spreadsheets']
+            });
+
+            const sheets = google.sheets({ version: 'v4', auth });
 
             // Preparar datos para Google Sheets
             const rowData = [
@@ -605,10 +617,10 @@ class GoogleSheetsIntegration {
                 clientData.specialRequirements || ''
             ];
 
-            // Agregar fila al Google Sheet (hoja principal - sin especificar nombre)
-            const response = await this.sheets.spreadsheets.values.append({
+            // Agregar fila al Google Sheet
+            const response = await sheets.spreadsheets.values.append({
                 spreadsheetId: this.spreadsheetId,
-                range: 'A:AA', // Usar la hoja principal por defecto
+                range: 'Form Responses 1!A:AA', // Especificar la hoja correcta
                 valueInputOption: 'USER_ENTERED',
                 resource: {
                     values: [rowData]
@@ -617,16 +629,8 @@ class GoogleSheetsIntegration {
 
             console.log('✅ Client added to Google Sheet successfully');
             
-                        // Invalidar cache inmediatamente
-            this.invalidateCache('clients');
-            this.invalidateCache('form_responses_clients');
-            this.clearCache(); // Limpiar todo el cache para forzar recarga
-
-            console.log('✅ Client added to Google Sheet successfully');
-            console.log('🔄 Cache invalidated - next request will fetch fresh data');
-            
-            // Forzar recarga de datos en el próximo request
-            this.lastCacheUpdate = 0;
+            // CACHE DISABLED - No cache invalidation needed since cache is disabled
+            console.log('🔄 Cache disabled - data will always be fresh');
 
             return {
                 success: true,
@@ -644,31 +648,29 @@ class GoogleSheetsIntegration {
 
     async updateClientInSheet(clientId, updateData) {
         try {
-        console.log('🔍 Starting updateClientInSheet...');
-        console.log('🔍 Client ID:', clientId);
-        console.log('🔍 Update data:', updateData);
-        
-            await this.ensureInitialized();
+            console.log('🔍 Starting updateClientInSheet...');
+            console.log('🔍 Client ID:', clientId);
+            console.log('🔍 Update data:', updateData);
             
-            // Verificar credenciales
-        console.log('🔍 Checking credentials...');
+            // Verificar credenciales del Service Account
+            console.log('🔍 Checking Service Account credentials...');
             console.log('🔍 GOOGLE_SERVICE_ACCOUNT_KEY exists:', !!(process.env.GOOGLE_SERVICE_ACCOUNT_KEY));
-        console.log('🔍 GOOGLE_SERVICE_ACCOUNT_KEY length:', process.env.GOOGLE_SERVICE_ACCOUNT_KEY ? process.env.GOOGLE_SERVICE_ACCOUNT_KEY.length : 0);
-        
-            // Si no hay credenciales válidas, simular la actualización
-            if (!process.env.GOOGLE_SERVICE_ACCOUNT_KEY || !this.sheets) {
-                console.log('⚠️ No valid credentials for Google Sheets API, simulating update...');
-                
-                // Actualizar el cliente en memoria para que se vea el cambio
-                Object.assign(client, updateData);
-                
-                return {
-                    success: true,
-                    updatedFields: Object.keys(updateData),
-                    message: 'Update simulated (no write access to Google Sheets)',
-                    simulated: true
-                };
+            console.log('🔍 GOOGLE_SERVICE_ACCOUNT_KEY length:', process.env.GOOGLE_SERVICE_ACCOUNT_KEY ? process.env.GOOGLE_SERVICE_ACCOUNT_KEY.length : 0);
+            
+            if (!process.env.GOOGLE_SERVICE_ACCOUNT_KEY) {
+                throw new Error('Service Account credentials not configured');
             }
+            
+            // Inicializar Google Sheets con Service Account para escritura
+            console.log('🔑 Initializing Google Sheets with Service Account for write access...');
+            const serviceAccountKey = JSON.parse(Buffer.from(process.env.GOOGLE_SERVICE_ACCOUNT_KEY, 'base64').toString());
+            const auth = new google.auth.GoogleAuth({
+                credentials: serviceAccountKey,
+                scopes: ['https://www.googleapis.com/auth/spreadsheets']
+            });
+            
+            const sheets = google.sheets({ version: 'v4', auth });
+            console.log('✅ Google Sheets with Service Account initialized for writing');
 
             // Obtener datos actuales de clientes
             console.log('🔍 Fetching real clients data from Google Sheets...');
@@ -689,9 +691,25 @@ class GoogleSheetsIntegration {
                     console.log(`🔍 Clients with similar rowIndexes:`, clients.filter(c => Math.abs(c.rowIndex - rowNumber) <= 5).map(c => ({ name: c.name, rowIndex: c.rowIndex })));
                 }
             } else {
-                client = clients.find(c => c.id === clientId || c.clientId === clientId);
                 console.log(`🔍 Looking for client with ID: ${clientId}`);
-                console.log(`🔍 Available IDs:`, clients.map(c => c.id || c.clientId).slice(0, 10));
+                console.log(`🔍 Available client IDs (first 10):`, clients.slice(0, 10).map(c => ({ 
+                    name: c.name, 
+                    id: c.id, 
+                    clientId: c.clientId,
+                    rowIndex: c.rowIndex 
+                })));
+                
+                client = clients.find(c => c.id === clientId || c.clientId === clientId);
+                
+                if (!client) {
+                    console.log(`❌ Client not found with ID: ${clientId}`);
+                    console.log(`🔍 All client IDs:`, clients.map(c => ({ 
+                        name: c.name, 
+                        id: c.id, 
+                        clientId: c.clientId,
+                        rowIndex: c.rowIndex 
+                    })));
+                }
             }
             
             if (!client) {
@@ -749,8 +767,8 @@ class GoogleSheetsIntegration {
                 };
             }
 
-            // Actualizar Google Sheets
-            const response = await this.sheets.spreadsheets.values.batchUpdate({
+            // Actualizar Google Sheets usando Service Account
+            const response = await sheets.spreadsheets.values.batchUpdate({
                 spreadsheetId: this.spreadsheetId,
                 resource: {
                     valueInputOption: 'USER_ENTERED',
@@ -1006,6 +1024,298 @@ class GoogleSheetsIntegration {
             }
         } catch (error) {
             console.error('❌ Error adding report to Google Sheets:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    async getReportsData() {
+        try {
+            console.log('🔍 Starting getReportsData...');
+            console.log('📋 Initialized status:', this.initialized);
+            console.log('📋 Has sheets client:', !!this.sheets);
+            
+            await this.ensureInitialized();
+            
+            // Try different possible sheet names where reports might be stored
+            const possibleRanges = [
+                'Reports!A:O',
+                'Form Responses 1!A:O',
+                'Sheet1!A:O',
+                'Data!A:O',
+                'Form Responses 1!A:Z'  // Try with more columns
+            ];
+            
+            let reports = [];
+            
+            for (const range of possibleRanges) {
+                try {
+                    console.log('🔍 Trying range:', range);
+                    const response = await this.sheets.spreadsheets.values.get({
+                        spreadsheetId: this.spreadsheetId,
+                        range: range,
+                        key: this.apiKey
+                    });
+                    
+                    const rows = response.data.values;
+                    console.log('📊 Raw rows from range', range, ':', rows ? rows.length : 0);
+                    
+                    if (rows && rows.length > 1) {
+                        // Found data, filter out examples and process it
+                        const filteredRows = rows.slice(1).filter(row => {
+                            // Excluir filas con datos de ejemplo
+                            const clientName = row[4] || ''; // Client Name
+                            const clientId = row[1] || ''; // Client ID
+                            const reportId = row[0] || ''; // Report ID
+                            
+                            // Lista de patrones de ejemplo a excluir
+                            const examplePatterns = [
+                                'test client', 'example', 'test-client', 'test-cli',
+                                'test-', 'demo', 'sample'
+                            ];
+                            
+                            const isExample = examplePatterns.some(pattern => 
+                                clientName.toLowerCase().includes(pattern) ||
+                                clientId.toLowerCase().includes(pattern) ||
+                                reportId.toLowerCase().includes(pattern)
+                            );
+                            
+                            if (isExample) {
+                                console.log(`🚫 Filtering out example report: ${clientName} (${reportId})`);
+                                return false;
+                            }
+                            
+                            return true;
+                        });
+                        
+                        reports = filteredRows.map(row => {
+                            return {
+                                reportId: row[0] || 'REP-' + Date.now(),
+                                clientId: row[1] || '',
+                                date: row[2] || new Date().toISOString().split('T')[0],
+                                company: row[3] || '',
+                                clientName: row[4] || 'Unknown',
+                                address: row[5] || '',
+                                reportType: row[6] || 'Fire Escape Inspection',
+                                status: row[7] || 'Generated',
+                                findings: row[8] || '',
+                                recommendations: row[9] || '',
+                                photos: row[10] || '',
+                                inspector: row[11] || 'David Ramirez',
+                                nextInspectionDate: row[12] || '',
+                                createdAt: row[13] || new Date().toISOString(),
+                                reportUrl: row[14] || ''
+                            };
+                        });
+                        console.log(`📊 Found ${reports.length} reports in range ${range}`);
+                        console.log('📋 Sample report:', reports[0]);
+                        break;
+                    }
+                } catch (error) {
+                    console.log(`⚠️ Range ${range} not found or empty:`, error.message);
+                    continue;
+                }
+            }
+            
+            if (reports.length === 0) {
+                console.log('📊 No reports found in any range, creating Reports sheet...');
+                await this.createReportsSheet();
+            }
+            
+            console.log(`📊 Final result: ${reports.length} reports`);
+            return reports;
+        } catch (error) {
+            console.error('❌ Error getting reports data:', error);
+            return [];
+        }
+    }
+
+    async createReportsSheet() {
+        try {
+            console.log('📊 Creating Reports sheet with headers...');
+            
+            // First, check if the sheet exists
+            const spreadsheet = await this.sheets.spreadsheets.get({
+                spreadsheetId: this.spreadsheetId,
+                key: this.apiKey
+            });
+            
+            const sheetExists = spreadsheet.data.sheets.some(sheet => 
+                sheet.properties.title === 'Reports'
+            );
+            
+            if (!sheetExists) {
+                // Create the Reports sheet
+                await this.sheets.spreadsheets.batchUpdate({
+                    spreadsheetId: this.spreadsheetId,
+                    key: this.apiKey,
+                    resource: {
+                        requests: [{
+                            addSheet: {
+                                properties: {
+                                    title: 'Reports',
+                                    gridProperties: {
+                                        rowCount: 1000,
+                                        columnCount: 15
+                                    }
+                                }
+                            }
+                        }]
+                    }
+                });
+                console.log('✅ Reports sheet created');
+            }
+            
+            // Add headers
+            const headers = [
+                'Report ID', 'Client ID', 'Date', 'Company', 'Client Name',
+                'Address', 'Report Type', 'Status', 'Findings', 'Recommendations',
+                'Photos', 'Inspector', 'Next Inspection Date', 'Created At', 'Report URL'
+            ];
+            
+            await this.sheets.spreadsheets.values.update({
+                spreadsheetId: this.spreadsheetId,
+                range: 'Reports!A1:O1',
+                valueInputOption: 'RAW',
+                key: this.apiKey,
+                resource: {
+                    values: [headers]
+                }
+            });
+            
+            console.log('✅ Reports sheet headers added');
+        } catch (error) {
+            console.error('❌ Error creating Reports sheet:', error);
+        }
+    }
+
+    async saveReport(reportData) {
+        try {
+            console.log('📊 Saving report to Google Sheets:', reportData);
+            
+            // Ensure we're initialized
+            if (!this.initialized) {
+                await this.initialize();
+            }
+            
+            // Generate report ID if not provided
+            if (!reportData.reportId) {
+                reportData.reportId = 'REP' + Date.now() + Math.random().toString(36).substr(2, 5).toUpperCase();
+            }
+            
+            // Add timestamp
+            reportData.timestamp = new Date().toISOString();
+            
+            // Prepare report row to match existing sheet structure
+            const reportRow = [
+                reportData.reportId,                    // A - Report ID
+                'CLI-AUTO',                             // B - Client ID (auto-generated)
+                reportData.inspectionDate || new Date().toISOString().split('T')[0], // C - Date
+                reportData.company || 'Irias Iron Works', // D - Company
+                reportData.clientName || '',            // E - Client Name
+                reportData.clientEmail || '',           // F - Address (using email as address)
+                reportData.reportType || 'Fire Escape Inspection', // G - Inspection Type
+                reportData.status || 'Generated',       // H - Status
+                reportData.findings || '',              // I - Findings
+                reportData.recommendations || '',       // J - Recommendations
+                '[]',                                   // K - Photos (empty array)
+                reportData.inspector || 'David Ramirez', // L - Inspector
+                '',                                     // M - Next Inspection Date
+                new Date().toISOString(),               // N - Created At
+                reportData.reportUrl || ''              // O - Report URL
+            ];
+            
+            // Add to Reports sheet (using existing structure with 15 columns A-O)
+            const reportsRange = 'Reports!A:O';
+            
+            try {
+                await this.sheets.spreadsheets.values.append({
+                    spreadsheetId: this.spreadsheetId,
+                    range: reportsRange,
+                    valueInputOption: 'RAW',
+                    insertDataOption: 'INSERT_ROWS',
+                    resource: {
+                        values: [reportRow]
+                    }
+                });
+                
+                console.log('✅ Report saved to Google Sheets successfully');
+                return { 
+                    success: true, 
+                    reportId: reportData.reportId,
+                    reportUrl: reportData.reportUrl 
+                };
+            } catch (sheetError) {
+                console.warn('⚠️ Reports sheet not found, creating it...');
+                
+                // Create Reports sheet with URL column
+                await this.sheets.spreadsheets.batchUpdate({
+                    spreadsheetId: this.spreadsheetId,
+                    key: this.apiKey,
+                    resource: {
+                        requests: [{
+                            addSheet: {
+                                properties: {
+                                    title: 'Reports',
+                                    gridProperties: {
+                                        rowCount: 1000,
+                                        columnCount: 10
+                                    }
+                                }
+                            }
+                        }]
+                    }
+                });
+                
+                // Add headers matching existing sheet structure
+                const headers = [
+                    'Report ID',           // A
+                    'Client ID',           // B
+                    'Date',                // C
+                    'Company',             // D
+                    'Client Name',         // E
+                    'Address',             // F
+                    'Inspection Type',     // G
+                    'Status',              // H
+                    'Findings',            // I
+                    'Recommendations',     // J
+                    'Photos',              // K
+                    'Inspector',           // L
+                    'Next Inspection Date', // M
+                    'Created At',          // N
+                    'Report URL'           // O
+                ];
+                
+                await this.sheets.spreadsheets.values.update({
+                    spreadsheetId: this.spreadsheetId,
+                    range: 'Reports!A1:O1',
+                    valueInputOption: 'RAW',
+                    key: this.apiKey,
+                    resource: {
+                        values: [headers]
+                    }
+                });
+                
+                // Add report data
+                await this.sheets.spreadsheets.values.append({
+                    spreadsheetId: this.spreadsheetId,
+                    range: 'Reports!A:O',
+                    valueInputOption: 'RAW',
+                    insertDataOption: 'INSERT_ROWS',
+                    key: this.apiKey,
+                    resource: {
+                        values: [reportRow]
+                    }
+                });
+                
+                console.log('✅ Reports sheet created and report saved successfully');
+                return { 
+                    success: true, 
+                    reportId: reportData.reportId,
+                    reportUrl: reportData.reportUrl 
+                };
+            }
+        } catch (error) {
+            console.error('❌ Error saving report to Google Sheets:', error);
             return { success: false, error: error.message };
         }
     }

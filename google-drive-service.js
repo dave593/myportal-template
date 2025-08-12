@@ -8,34 +8,47 @@ class GoogleDriveService {
         this.isConfigured = false;
     }
 
+    async initialize() {
+        try {
+            console.log('📁 Initializing Google Drive service...');
+            const result = await this.configure();
+            if (result) {
+                return {
+                    success: true,
+                    message: 'Google Drive service initialized successfully'
+                };
+            } else {
+                return {
+                    success: false,
+                    message: 'Google Drive service not configured'
+                };
+            }
+        } catch (error) {
+            console.error('❌ Error initializing Google Drive service:', error);
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+
     async configure() {
         try {
             // Check if we have the necessary environment variables
-            if (!process.env.GOOGLE_APPLICATION_CREDENTIALS && !process.env.GOOGLE_SERVICE_ACCOUNT_KEY) {
+            if (!process.env.GOOGLE_DRIVE_CREDENTIALS) {
                 console.log('Google Drive: No credentials configured');
                 return false;
             }
 
             let credentials;
             
-            // Try to load credentials from environment variable first
-            if (process.env.GOOGLE_SERVICE_ACCOUNT_KEY) {
-                try {
-                    credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY);
-                } catch (error) {
-                    console.error('Google Drive: Invalid service account key in environment variable');
-                    return false;
-                }
-            } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
-                // Load from file
-                try {
-                    const keyPath = path.resolve(process.env.GOOGLE_APPLICATION_CREDENTIALS);
-                    const keyFile = fs.readFileSync(keyPath, 'utf8');
-                    credentials = JSON.parse(keyFile);
-                } catch (error) {
-                    console.error('Google Drive: Could not load credentials file:', error.message);
-                    return false;
-                }
+            // Try to load credentials from environment variable
+            try {
+                credentials = JSON.parse(process.env.GOOGLE_DRIVE_CREDENTIALS);
+                console.log('Google Drive: Credentials loaded from environment variable');
+            } catch (error) {
+                console.error('Google Drive: Invalid credentials in environment variable');
+                return false;
             }
 
             // Create auth client

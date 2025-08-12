@@ -199,7 +199,7 @@ class ClientDataMapper {
         });
         
         const mapped = {
-            clientId: clientData.rowIndex ? `ROW-${clientData.rowIndex}` : (clientData.clientId || clientData.id || ''),
+            clientId: clientData.clientId || clientData.id || (clientData.rowIndex ? `ROW-${clientData.rowIndex}` : ''),
             clientFullName: clientData.name || clientData['Client Full Name'] || 'N/A',
             email: clientData.email || clientData['E-mail'] || 'N/A',
             phone: clientData.phone || clientData['Customer Phone Number'] || 'N/A',
@@ -293,12 +293,52 @@ class ClientDataMapper {
 
 // Client API Manager - Centralized API operations
 class ClientAPIManager {
+    // Get authentication token from localStorage or sessionStorage
+    static getAuthToken() {
+        // Try to get token from localStorage first (persistent)
+        let token = localStorage.getItem('fire_escape_jwt_token') || localStorage.getItem('authToken') || localStorage.getItem('jwtToken');
+        
+        // If not in localStorage, try sessionStorage (session-only)
+        if (!token) {
+            token = sessionStorage.getItem('fire_escape_jwt_token') || sessionStorage.getItem('authToken') || sessionStorage.getItem('jwtToken');
+        }
+        
+        // If still no token, try to get from URL parameters (for OAuth flow)
+        if (!token) {
+            const urlParams = new URLSearchParams(window.location.search);
+            token = urlParams.get('token') || urlParams.get('access_token');
+            
+            // If token found in URL, save it to localStorage and clean URL
+            if (token) {
+                console.log('🔑 Token found in URL, saving to localStorage');
+                localStorage.setItem('fire_escape_jwt_token', token);
+                
+                // Clean URL by removing token parameter
+                const newUrl = new URL(window.location);
+                newUrl.searchParams.delete('token');
+                newUrl.searchParams.delete('access_token');
+                newUrl.searchParams.delete('success');
+                window.history.replaceState({}, document.title, newUrl.pathname);
+            }
+        }
+        
+        console.log('🔑 Auth token found:', !!token);
+        return token;
+    }
+
     static async updateClientData(clientId, updateData) {
         try {
+            // Get authentication token
+            const token = this.getAuthToken();
+            if (!token) {
+                throw new Error('Authentication required. Please login first.');
+            }
+            
             const response = await fetch('/api/client-update', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({
                     clientId: clientId,
@@ -321,23 +361,42 @@ class ClientAPIManager {
 
     static async updateClientStatus(clientId, status) {
         try {
+            console.log('🔍 ClientAPIManager.updateClientStatus called with:', { clientId, status });
+            
+            // Get authentication token
+            const token = this.getAuthToken();
+            if (!token) {
+                throw new Error('Authentication required. Please login first.');
+            }
+            
+            console.log('🔑 Token found, making request to /api/client-status');
+            
+            const requestBody = {
+                clientId: clientId,
+                status: status
+            };
+            
+            console.log('📤 Request body:', requestBody);
+            
             const response = await fetch('/api/client-status', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({
-                    clientId: clientId,
-                    status: status
-                })
+                body: JSON.stringify(requestBody)
             });
 
+            console.log('📥 Response status:', response.status);
+            
             const result = await response.json();
+            console.log('📥 Response result:', result);
             
             if (!result.success) {
                 throw new Error(result.message || 'Failed to update client status');
             }
             
+            console.log('✅ Update successful:', result);
             return result;
         } catch (error) {
             console.error('ClientAPIManager.updateClientStatus error:', error);
@@ -405,10 +464,17 @@ Created from IRIAS Ironworks Portal
 
     static async createReport(clientId) {
         try {
+            // Get authentication token
+            const token = this.getAuthToken();
+            if (!token) {
+                throw new Error('Authentication required. Please login first.');
+            }
+            
             const response = await fetch('/api/create-report', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({
                     clientId: clientId
@@ -508,20 +574,88 @@ class ClientManager {
         this.showNotification('✅ Data refreshed successfully', 'success', 2000);
     }
 
+    // Get authentication token from localStorage or sessionStorage
+    getAuthToken() {
+        // Use global authentication if available
+        if (window.globalAuth && window.globalAuth.getAuthToken) {
+            return window.globalAuth.getAuthToken();
+        }
+        
+        // Fallback to local method
+        let token = localStorage.getItem('fire_escape_jwt_token') || localStorage.getItem('authToken') || localStorage.getItem('jwtToken');
+        
+        if (!token) {
+            token = sessionStorage.getItem('fire_escape_jwt_token') || sessionStorage.getItem('authToken') || sessionStorage.getItem('jwtToken');
+        }
+        
+        if (!token) {
+            const urlParams = new URLSearchParams(window.location.search);
+            token = urlParams.get('token') || urlParams.get('access_token');
+            
+            if (token) {
+                console.log('🔑 Token found in URL, saving to localStorage');
+                localStorage.setItem('fire_escape_jwt_token', token);
+                
+                const newUrl = new URL(window.location);
+                newUrl.searchParams.delete('token');
+                newUrl.searchParams.delete('access_token');
+                newUrl.searchParams.delete('success');
+                window.history.replaceState({}, document.title, newUrl.pathname);
+            }
+        }
+        
+        console.log('🔑 Auth token found:', !!token);
+        return token;
+    }
+
     async loadClients() {
         console.log('🔄 ClientManager.loadClients() started');
         try {
             this.showLoadingState();
             
-            const response = await fetch('/api/clients');
+            // Get authentication token
+            const token = this.getAuthToken();
+            if (!token) {
+                console.error('❌ No authentication token found');
+                this.showNotification('Authentication required. Please login first.', 'error');
+                
+                // Redirect to login page after 3 seconds
+                setTimeout(() => {
+                    window.location.href = '/login.html';
+                }, 3000);
+                return;
+            }
+            
+            // Add cache busting parameter
+            const timestamp = new Date().getTime();
+            const response = await fetch(`/api/clients?_t=${timestamp}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache'
+                }
+            });
             const responseData = await response.json();
             
             console.log('📊 API Response:', responseData);
+            console.log('📊 ResponseData type:', typeof responseData);
+            console.log('📊 ResponseData.data type:', typeof responseData.data);
+            console.log('📊 ResponseData.data:', responseData.data);
             
             if (responseData.success && responseData.data) {
                 const clientsData = responseData.data.clients || responseData.data;
                 
-                console.log('📋 Raw clients data (first 2):', clientsData.slice(0, 2));
+                console.log('📋 ClientsData type:', typeof clientsData);
+                console.log('📋 ClientsData is array:', Array.isArray(clientsData));
+                console.log('📋 ClientsData:', clientsData);
+                
+                if (Array.isArray(clientsData)) {
+                    console.log('📋 Raw clients data (first 2):', clientsData.slice(0, 2));
+                } else {
+                    console.log('❌ ClientsData is not an array!');
+                    console.log('📋 ClientsData keys:', Object.keys(clientsData || {}));
+                }
                 
                 // Use centralized data mapping
                 this.clients = ClientDataMapper.mapClientsArray(clientsData);
@@ -1118,6 +1252,14 @@ class ClientManager {
                     if (window.loadingManager) window.loadingManager.showGlobal();
                     this.showNotification('🔄 Updating client status in Google Sheets...', 'info', 2000);
                     
+                    console.log('🔍 About to update client:', {
+                        clientId: clientId,
+                        clientName: client.clientFullName,
+                        currentStatus: client.customerStatus,
+                        newStatus: newStatus.trim(),
+                        clientData: client
+                    });
+                    
                     const result = await ClientAPIManager.updateClientStatus(clientId, newStatus.trim());
                     
                     // Update status locally without reloading all data
@@ -1131,12 +1273,29 @@ class ClientManager {
                         filteredClient.lastUpdated = new Date().toISOString();
                     }
                     
+                    // Update stats without full reload
+                    this.updateStats();
+                    
+                    // Re-render only the table, not full page reload
                     this.renderClientsTable();
+                    
+                    console.log(`✅ Status updated locally for ${client.clientFullName}: ${newStatus}`);
                     
                     if (result.simulated) {
                         this.showNotification(`⚠️ Status update simulated to "${newStatus}" for "${client.clientFullName}" (configure credentials for real updates)`, 'warning', 6000);
                     } else {
-                        this.showNotification(`✅ Status updated to "${newStatus}" in Google Sheets for "${client.clientFullName}"`, 'success', 4000);
+                        this.showNotification(`✅ Status updated to "${newStatus}" in Google Sheets for "${client.clientFullName}" - Changes saved!`, 'success', 5000);
+                        
+                        // Add visual confirmation on the table row
+                        const row = document.querySelector(`[data-client-id="${clientId}"]`);
+                        if (row) {
+                            row.style.backgroundColor = '#d4edda';
+                            row.style.borderLeft = '4px solid #28a745';
+                            setTimeout(() => {
+                                row.style.backgroundColor = '';
+                                row.style.borderLeft = '';
+                            }, 3000);
+                        }
                     }
                 } catch (error) {
                     console.error('Error updating status:', error);
@@ -1639,12 +1798,16 @@ window.addEventListener('load', () => {
     console.log('🔄 Initializing ClientManager...');
     window.clientManager.init().then(() => {
         console.log('✅ ClientManager initialized successfully');
-        // Set up auto-refresh every 30 seconds
-        setInterval(async () => {
-            if (window.clientManager) {
-                await window.clientManager.loadClients();
-            }
-        }, 30000);
+        // AUTO-REFRESH DISABLED: Prevents data reversion after updates
+        // Users can manually refresh when needed using the refresh button
+        console.log('🚫 Auto-refresh disabled to prevent data reversion issues');
+        
+        // OLD CODE - KEPT FOR REFERENCE
+        // setInterval(async () => {
+        //     if (window.clientManager) {
+        //         await window.clientManager.loadClients();
+        //     }
+        // }, 30000);
     }).catch(error => {
         console.error('❌ Error initializing ClientManager:', error);
     });
